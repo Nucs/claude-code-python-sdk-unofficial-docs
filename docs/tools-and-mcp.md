@@ -1,6 +1,6 @@
 # Tools & MCP - Claude Agent SDK
 
-> **Comprehensive guide to built-in tools, custom tool development, and the MCP ecosystem**
+> **Comprehensive guide to built-in tools, custom tool development, MCP ecosystem, and SuperClaude framework integration**
 
 [← Back to Index](index.md)
 
@@ -11,9 +11,10 @@
 1. [Built-in Tools](#built-in-tools)
 2. [Custom Tool Development](#custom-tool-development)
 3. [MCP Server Architecture](#mcp-server-architecture)
-4. [MCP Ecosystem Catalog](#mcp-ecosystem-catalog)
-5. [Building Custom MCP Servers](#building-custom-mcp-servers)
-6. [Tool Integration Patterns](#tool-integration-patterns)
+4. [SuperClaude Framework MCP Servers](#superclaude-framework-mcp-servers)
+5. [MCP Ecosystem Catalog](#mcp-ecosystem-catalog)
+6. [Building Custom MCP Servers](#building-custom-mcp-servers)
+7. [Tool Integration Patterns](#tool-integration-patterns)
 
 ---
 
@@ -385,6 +386,379 @@ options = ClaudeAgentOptions(
 
 ---
 
+## SuperClaude Framework MCP Servers
+
+The SuperClaude framework provides specialized MCP servers for advanced capabilities. **See**: [@CLAUDE.md](../../../CLAUDE.md)
+
+### Sequential MCP (Structured Reasoning)
+
+**Purpose**: Multi-step reasoning engine for complex analysis and systematic problem solving
+
+**Installation**:
+```bash
+npx -y @modelcontextprotocol/server-sequential-thinking
+```
+
+**Configuration**:
+```python
+from claude_agent_sdk import ClaudeAgentOptions, ClaudeSDKClient
+
+options = ClaudeAgentOptions(
+    setting_sources=["project"],  # Load CLAUDE.md
+
+    mcp_servers={
+        "sequential": {
+            "type": "stdio",
+            "command": "npx",
+            "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"]
+        }
+    },
+
+    allowed_tools=["mcp__sequential__sequentialthinking", "Read", "Grep"],
+
+    system_prompt={
+        "type": "preset",
+        "preset": "claude_code",
+        "append": "--think-hard"  # Activate deep analysis mode
+    }
+)
+
+async with ClaudeSDKClient(options=options) as client:
+    await client.query("""
+    Debug authentication flow:
+    1. Analyze login endpoint
+    2. Trace token generation
+    3. Identify vulnerabilities
+    """)
+
+    async for msg in client.receive_response():
+        print(msg)
+```
+
+**Use Cases**:
+- Complex debugging scenarios with multiple layers
+- Architectural analysis and system design
+- Root cause analysis with hypothesis testing
+- Multi-component failure investigation
+
+**See**: [@MCP_Sequential.md](../../../MCP_Sequential.md)
+
+### Serena MCP (Memory & Semantic Understanding)
+
+**Purpose**: Semantic code understanding with project memory and cross-session persistence
+
+**Installation**:
+```bash
+npx -y @serena/mcp-server
+```
+
+**Configuration**:
+```python
+options = ClaudeAgentOptions(
+    setting_sources=["project"],
+
+    mcp_servers={
+        "serena": {
+            "type": "stdio",
+            "command": "npx",
+            "args": ["-y", "@serena/mcp-server"]
+        }
+    },
+
+    allowed_tools=[
+        "mcp__serena__write_memory",
+        "mcp__serena__read_memory",
+        "mcp__serena__list_memories",
+        "mcp__serena__delete_memory",
+        "TodoWrite", "Read", "Write"
+    ],
+
+    system_prompt={
+        "type": "preset",
+        "preset": "claude_code",
+        "append": "--task-manage"
+    }
+)
+```
+
+**Memory Operations**:
+```python
+# Session 1: Store context
+async with ClaudeSDKClient(options=options) as client:
+    await client.query("""
+    Plan microservices architecture.
+    Store plan in memory for future sessions.
+    """)
+
+# Session 2: Resume (hours/days later)
+async with ClaudeSDKClient(options=options) as client:
+    await client.query("Continue microservices implementation from stored plan")
+    # Claude retrieves context from Serena memory automatically
+```
+
+**Use Cases**:
+- Symbol operations: rename, extract, move functions/classes
+- Cross-session project memory
+- Large codebase navigation (>50 files)
+- Session lifecycle management (/sc:load, /sc:save)
+
+**See**: [@MCP_Serena.md](../../../MCP_Serena.md), [@MODE_Task_Management.md](../../../MODE_Task_Management.md)
+
+### Magic MCP (UI Component Generation)
+
+**Purpose**: Modern UI component generation from 21st.dev patterns with design system integration
+
+**Installation**:
+```bash
+npx -y @21st-dev/magic-mcp
+```
+
+**Configuration**:
+```python
+options = ClaudeAgentOptions(
+    setting_sources=["project"],
+
+    mcp_servers={
+        "magic": {
+            "type": "stdio",
+            "command": "npx",
+            "args": ["-y", "@21st-dev/magic-mcp"]
+        }
+    },
+
+    allowed_tools=[
+        "mcp__magic__21st_magic_component_builder",
+        "mcp__magic__21st_magic_component_refiner",
+        "Write", "Edit"
+    ],
+
+    system_prompt={
+        "type": "preset",
+        "preset": "claude_code"
+    }
+)
+
+async with ClaudeSDKClient(options=options) as client:
+    await client.query("""
+    Create responsive login form with:
+    - Email and password fields
+    - Remember me checkbox
+    - Accessibility compliant
+    """)
+```
+
+**Use Cases**:
+- UI component requests: button, form, modal, card, table
+- Design system implementation
+- Frontend-specific: responsive, accessible, interactive
+- Component enhancement or refinement
+
+**See**: [@MCP_Magic.md](../../../MCP_Magic.md)
+
+### Context7 MCP (Official Documentation)
+
+**Purpose**: Official library documentation lookup and framework pattern guidance
+
+**Installation**:
+```bash
+npx -y @context7/mcp-server
+```
+
+**Configuration**:
+```python
+options = ClaudeAgentOptions(
+    setting_sources=["project"],
+
+    mcp_servers={
+        "context7": {
+            "type": "stdio",
+            "command": "npx",
+            "args": ["-y", "@context7/mcp-server"]
+        }
+    },
+
+    allowed_tools=[
+        "mcp__context7__resolve_library_id",
+        "mcp__context7__get_library_docs"
+    ]
+)
+
+async with ClaudeSDKClient(options=options) as client:
+    await client.query("""
+    Get React 18 hooks documentation:
+    - useEffect patterns
+    - useCallback optimization
+    """)
+```
+
+**Use Cases**:
+- Import statements: `import`, `require`, `from`, `use`
+- Framework-specific: React, Vue, Angular, Next.js
+- Official documentation patterns vs generic solutions
+- Version-specific implementation requirements
+
+**See**: [@MCP_Context7.md](../../../MCP_Context7.md)
+
+### Morphllm MCP (Pattern-Based Edits)
+
+**Purpose**: Pattern-based code editing with token optimization for bulk transformations
+
+**Installation**:
+```bash
+npx -y @morphllm/mcp-server
+```
+
+**Configuration**:
+```python
+options = ClaudeAgentOptions(
+    setting_sources=["project"],
+
+    mcp_servers={
+        "morphllm": {
+            "type": "stdio",
+            "command": "npx",
+            "args": ["-y", "@morphllm/mcp-server"]
+        }
+    },
+
+    allowed_tools=["mcp__morphllm__bulk_edit", "Read", "Write"],
+
+    system_prompt={
+        "type": "preset",
+        "preset": "claude_code",
+        "append": "--token-efficient"
+    }
+)
+
+async with ClaudeSDKClient(options=options) as client:
+    await client.query("Update all React class components to hooks")
+```
+
+**Use Cases**:
+- Multi-file edit operations with consistent patterns
+- Framework updates, style guide enforcement
+- Bulk text replacements across codebase
+- Token efficiency for large-scale operations
+
+**See**: [@MCP_Morphllm.md](../../../MCP_Morphllm.md)
+
+### Playwright MCP (Browser Automation)
+
+**Purpose**: Browser automation and E2E testing with real browser interaction
+
+**Installation**:
+```bash
+npx -y @anthropic/mcp-playwright
+```
+
+**Configuration**:
+```python
+options = ClaudeAgentOptions(
+    setting_sources=["project"],
+
+    mcp_servers={
+        "playwright": {
+            "type": "stdio",
+            "command": "npx",
+            "args": ["-y", "@anthropic/mcp-playwright"]
+        }
+    },
+
+    allowed_tools=[
+        "mcp__playwright__browser_navigate",
+        "mcp__playwright__browser_click",
+        "mcp__playwright__browser_type",
+        "mcp__playwright__browser_snapshot",
+        "mcp__playwright__browser_take_screenshot"
+    ]
+)
+
+async with ClaudeSDKClient(options=options) as client:
+    await client.query("""
+    E2E Test: Login Flow
+    1. Navigate to login page
+    2. Fill credentials
+    3. Click submit
+    4. Verify success
+    """)
+```
+
+**Use Cases**:
+- Browser testing and E2E scenarios
+- Visual testing and screenshot validation
+- Form submission and user interaction testing
+- Accessibility testing (WCAG compliance)
+
+**See**: [@MCP_Playwright.md](../../../MCP_Playwright.md)
+
+### Multi-MCP Framework Orchestration
+
+**Purpose**: Coordinate multiple SuperClaude MCP servers for comprehensive workflows
+
+**Configuration**:
+```python
+options = ClaudeAgentOptions(
+    setting_sources=["project"],
+
+    # Enable multiple framework MCP servers
+    mcp_servers={
+        "sequential": {
+            "type": "stdio",
+            "command": "npx",
+            "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"]
+        },
+        "context7": {
+            "type": "stdio",
+            "command": "npx",
+            "args": ["-y", "@context7/mcp-server"]
+        },
+        "magic": {
+            "type": "stdio",
+            "command": "npx",
+            "args": ["-y", "@21st-dev/magic-mcp"]
+        },
+        "serena": {
+            "type": "stdio",
+            "command": "npx",
+            "args": ["-y", "@serena/mcp-server"]
+        }
+    },
+
+    allowed_tools=[
+        "mcp__sequential__sequentialthinking",
+        "mcp__context7__get_library_docs",
+        "mcp__magic__21st_magic_component_builder",
+        "mcp__serena__write_memory",
+        "Read", "Write", "Edit"
+    ],
+
+    system_prompt={
+        "type": "preset",
+        "preset": "claude_code",
+        "append": "--orchestrate --think-hard --task-manage"
+    }
+)
+
+async with ClaudeSDKClient(options=options) as client:
+    await client.query("""
+    Build React dashboard:
+    1. Context7: Get React best practices
+    2. Sequential: Analyze architecture approach
+    3. Magic: Generate UI components
+    4. Serena: Store implementation decisions
+    5. Implement with Write/Edit tools
+    """)
+```
+
+**Orchestration Benefits**:
+- **Context7**: Official framework patterns
+- **Sequential**: Structured analysis
+- **Magic**: Production-ready UI
+- **Serena**: Cross-session memory
+- **Orchestration Mode**: Intelligent tool routing [@MODE_Orchestration.md](../../../MODE_Orchestration.md)
+
+---
+
 ## MCP Ecosystem Catalog
 
 The MCP ecosystem includes 500+ servers across multiple categories.[^6]
@@ -681,6 +1055,115 @@ Analyze the codebase:
 # Results in parallel: Glob + Grep + Grep
 ```
 
+### SuperClaude Framework Patterns
+
+**Pattern 3: MODE-Driven Tool Selection**:
+```python
+options = ClaudeAgentOptions(
+    setting_sources=["project"],
+
+    system_prompt={
+        "type": "preset",
+        "preset": "claude_code",
+        "append": "--orchestrate --think-hard"
+    },
+
+    allowed_tools=["Read", "Grep", "mcp__sequential__sequentialthinking"]
+)
+
+async with ClaudeSDKClient(options=options) as client:
+    await client.query("Analyze authentication security")
+    # --orchestrate mode optimizes tool selection
+    # --think-hard activates Sequential MCP for deep analysis
+```
+
+**See**: [@MODE_Orchestration.md](../../../MODE_Orchestration.md)
+
+**Pattern 4: RULES.md Enforcement via Hooks**:
+```python
+from claude_agent_sdk import HookMatcher
+
+async def enforce_git_safety(input_data, tool_use_id, context):
+    """Implement RULES.md git safety rules"""
+    if input_data.get("tool_name") == "Bash":
+        cmd = input_data.get("tool_input", {}).get("command", "")
+
+        # RULES.md: Never force push to main
+        if "push --force" in cmd and "main" in cmd:
+            return {
+                "hookSpecificOutput": {
+                    "permissionDecision": "deny",
+                    "permissionDecisionReason": "Never force push to main (RULES.md)"
+                }
+            }
+
+        # RULES.md: Always Read before Write
+        if ">" in cmd and "write" in cmd.lower():
+            return {
+                "hookSpecificOutput": {
+                    "permissionDecision": "deny",
+                    "permissionDecisionReason": "Use Write tool, not shell redirection (RULES.md)"
+                }
+            }
+
+    return {}
+
+options = ClaudeAgentOptions(
+    setting_sources=["project"],
+    hooks={
+        "PreToolUse": [
+            HookMatcher(matcher="Bash", hooks=[enforce_git_safety])
+        ]
+    },
+    allowed_tools=["Bash", "Read", "Write"]
+)
+```
+
+**See**: [@RULES.md](../../../RULES.md)
+
+**Pattern 5: Cross-Session Task Management**:
+```python
+options = ClaudeAgentOptions(
+    setting_sources=["project"],
+
+    mcp_servers={
+        "serena": {
+            "type": "stdio",
+            "command": "npx",
+            "args": ["-y", "@serena/mcp-server"]
+        }
+    },
+
+    allowed_tools=[
+        "TodoWrite",
+        "mcp__serena__write_memory",
+        "mcp__serena__read_memory",
+        "Read", "Write", "Edit"
+    ],
+
+    system_prompt={
+        "type": "preset",
+        "preset": "claude_code",
+        "append": "--task-manage"
+    }
+)
+
+# Session 1: Plan and track
+async with ClaudeSDKClient(options=options) as client:
+    await client.query("""
+    Plan authentication system:
+    1. Use TodoWrite for task tracking
+    2. Store plan in Serena memory
+    """)
+
+# Session 2: Continue (hours/days later)
+async with ClaudeSDKClient(options=options) as client:
+    await client.query("Continue authentication implementation from plan")
+    # TodoWrite state + Serena memory provide full context
+```
+
+**See**: [@MODE_Task_Management.md](../../../MODE_Task_Management.md), [@MCP_Serena.md](../../../MCP_Serena.md)
+
 ### Tool Permission Strategies
 
 **Ask Mode** (Maximum Control):
@@ -781,7 +1264,7 @@ options = ClaudeAgentOptions(
 
 ### Combined Built-in and MCP Tools
 
-**Example: Enhanced Code Analysis**:
+**Example: Enhanced Code Analysis with SuperClaude**:
 ```python
 from claude_agent_sdk import tool, create_sdk_mcp_server
 
@@ -797,32 +1280,54 @@ custom_server = create_sdk_mcp_server(
 )
 
 options = ClaudeAgentOptions(
+    setting_sources=["project"],
+
+    # Built-in + Framework MCP + Custom tools
     allowed_tools=[
-        "Read",                           # Read files
-        "Grep",                           # Search code
-        "mcp__github__list_issues",       # GitHub issues
-        "mcp__analysis__complexity_analysis"  # Custom analysis
+        "Read", "Grep",                           # Built-in tools
+        "mcp__sequential__sequentialthinking",    # Framework: Reasoning
+        "mcp__github__list_issues",               # Ecosystem: GitHub
+        "mcp__analysis__complexity_analysis"      # Custom: Analysis
     ],
+
     mcp_servers={
-        "analysis": custom_server,
+        "sequential": {
+            "type": "stdio",
+            "command": "npx",
+            "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"]
+        },
         "github": {
             "command": "npx",
             "args": ["-y", "@modelcontextprotocol/server-github"],
             "env": {"GITHUB_TOKEN": "token"}
-        }
+        },
+        "analysis": custom_server
+    },
+
+    system_prompt={
+        "type": "preset",
+        "preset": "claude_code",
+        "append": "--orchestrate --think-hard"
     }
 )
 
 async with ClaudeSDKClient(options=options) as client:
     await client.query("""
-    Analyze the codebase:
-    1. Find complex functions with Grep
-    2. Analyze complexity with custom tool
-    3. Check if there are related GitHub issues
+    Comprehensive codebase analysis:
+    1. Grep: Find complex functions
+    2. Sequential: Analyze architectural patterns
+    3. Custom tool: Assess complexity metrics
+    4. GitHub: Check related issues
+    5. Synthesize findings
     """)
-    async for msg in client.receive_response():
-        print(msg)
 ```
+
+**Tool Selection Intelligence**:
+- **Built-in tools**: Fast, always available, core operations
+- **Framework MCP**: Specialized capabilities (Sequential, Serena, Magic)
+- **Ecosystem MCP**: Third-party integrations (GitHub, Slack, databases)
+- **Custom MCP**: Domain-specific logic
+- **Orchestration Mode**: Automatic optimal routing [@MODE_Orchestration.md](../../../MODE_Orchestration.md)
 
 ---
 

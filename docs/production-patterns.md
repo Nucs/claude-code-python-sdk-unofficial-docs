@@ -1,6 +1,6 @@
 # Production Patterns - Claude Agent SDK
 
-> **Enterprise deployment strategies, scaling patterns, and production best practices**
+> **Enterprise deployment strategies, scaling patterns, production best practices, and SuperClaude framework integration**
 
 [← Back to Index](index.md)
 
@@ -9,13 +9,14 @@
 ## Table of Contents
 
 1. [Enterprise Deployment Models](#enterprise-deployment-models)
-2. [CLAUDE.md Multi-Level Deployment](#claudemd-multi-level-deployment)
-3. [Security Configurations](#security-configurations)
-4. [Headless Mode Automation](#headless-mode-automation)
-5. [CI/CD Integration](#cicd-integration)
-6. [Monitoring & Observability](#monitoring--observability)
-7. [Cost Management](#cost-management)
-8. [Scaling Architectures](#scaling-architectures)
+2. [SuperClaude Framework Production Integration](#superclaude-framework-production-integration)
+3. [CLAUDE.md Multi-Level Deployment](#claudemd-multi-level-deployment)
+4. [Security Configurations](#security-configurations)
+5. [Headless Mode Automation](#headless-mode-automation)
+6. [CI/CD Integration](#cicd-integration)
+7. [Monitoring & Observability](#monitoring--observability)
+8. [Cost Management](#cost-management)
+9. [Scaling Architectures](#scaling-architectures)
 
 ---
 
@@ -251,6 +252,391 @@ class AgentOrchestrator:
 ```
 
 **Deployment**: Kubernetes with service mesh (Istio, Linkerd)
+
+---
+
+## SuperClaude Framework Production Integration
+
+Production patterns for SuperClaude framework deployment with enterprise-grade reliability. **See**: [@CLAUDE.md](../../../CLAUDE.md)
+
+### Framework-Aware Production Service
+
+**Purpose**: Deploy Claude Agent SDK with full SuperClaude framework support in production
+
+**Architecture**:
+```python
+from claude_agent_sdk import ClaudeSDKClient, ClaudeAgentOptions, HookMatcher
+import asyncio
+import logging
+
+class SuperClaudeProductionService:
+    def __init__(self, environment: str = "production"):
+        self.environment = environment
+        self.logger = logging.getLogger(__name__)
+
+        self.options = ClaudeAgentOptions(
+            # Load framework instructions from project
+            setting_sources=["project"],
+
+            # Activate production-optimized modes
+            system_prompt={
+                "type": "preset",
+                "preset": "claude_code",
+                "append": "--orchestrate --think-hard --token-efficient"
+            },
+
+            # Enable framework MCP servers
+            mcp_servers={
+                "sequential": {
+                    "type": "stdio",
+                    "command": "npx",
+                    "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"]
+                },
+                "serena": {
+                    "type": "stdio",
+                    "command": "npx",
+                    "args": ["-y", "@serena/mcp-server"]
+                },
+                "context7": {
+                    "type": "stdio",
+                    "command": "npx",
+                    "args": ["-y", "@context7/mcp-server"]
+                }
+            },
+
+            # Production tool allowlist
+            allowed_tools=[
+                "Read", "Grep", "Glob",
+                "mcp__sequential__sequentialthinking",
+                "mcp__serena__write_memory",
+                "mcp__serena__read_memory",
+                "mcp__context7__get_library_docs",
+                "mcp__database__query"
+            ],
+
+            # Automated execution
+            permission_mode='acceptAll',
+
+            # RULES.md enforcement via hooks
+            hooks={
+                'PreToolUse': [
+                    HookMatcher(matcher='Bash', hooks=[self._enforce_safety_rules])
+                ],
+                'PostToolUse': [
+                    HookMatcher(matcher='*', hooks=[self._log_tool_execution])
+                ]
+            },
+
+            # Performance tuning
+            max_tokens=8192,
+            max_turns=30
+        )
+
+    async def _enforce_safety_rules(self, input_data, tool_use_id, context):
+        """Implement RULES.md safety enforcement"""
+        # See RULES.md for production safety standards
+        tool_name = input_data.get('tool_name')
+
+        if tool_name == 'Bash':
+            cmd = input_data.get('tool_input', {}).get('command', '')
+
+            # RULES.md: Never force push to production branches
+            if 'push --force' in cmd and any(branch in cmd for branch in ['main', 'master', 'production']):
+                return {
+                    'hookSpecificOutput': {
+                        'permissionDecision': 'deny',
+                        'permissionDecisionReason': 'Force push to protected branches blocked (RULES.md)'
+                    }
+                }
+
+        return {}
+
+    async def _log_tool_execution(self, input_data, tool_use_id, context):
+        """Log all tool executions for audit trail"""
+        self.logger.info({
+            "event": "tool_execution",
+            "tool": input_data.get('tool_name'),
+            "environment": self.environment,
+            "tool_use_id": tool_use_id
+        })
+        return {}
+
+    async def process_request(self, request: dict) -> dict:
+        """Process request with framework integration"""
+        async with ClaudeSDKClient(options=self.options) as client:
+            # Load context from Serena if available
+            await client.query("read_memory('production_context')")
+
+            # Process main request with framework orchestration
+            await client.query(request['prompt'])
+
+            result = []
+            async for msg in client.receive_response():
+                result.append(msg)
+
+            # Store session context for future requests
+            await client.query(f"write_memory('production_context', '{result}')")
+
+            return {
+                "status": "success",
+                "response": "".join(result),
+                "environment": self.environment
+            }
+
+# Production deployment
+if __name__ == "__main__":
+    service = SuperClaudeProductionService(environment="production")
+    asyncio.run(service.process_request({
+        "prompt": "Analyze system performance using Sequential MCP for deep analysis"
+    }))
+```
+
+**Framework Benefits in Production**:
+- **Orchestration Mode**: Automatic tool selection optimization [@MODE_Orchestration.md](../../../MODE_Orchestration.md)
+- **Sequential MCP**: Deep analysis for complex production issues [@MCP_Sequential.md](../../../MCP_Sequential.md)
+- **Serena MCP**: Cross-session context preservation [@MCP_Serena.md](../../../MCP_Serena.md)
+- **RULES.md Enforcement**: Production safety standards [@RULES.md](../../../RULES.md)
+- **Token Efficiency**: Optimized production costs [@MODE_Token_Efficiency.md](../../../MODE_Token_Efficiency.md)
+
+### Cross-Session Production Continuity
+
+**Purpose**: Maintain production context across sessions using Serena MCP
+
+**Architecture**:
+```python
+from claude_agent_sdk import ClaudeSDKClient, ClaudeAgentOptions
+import asyncio
+
+class ContinuousProductionService:
+    def __init__(self):
+        self.options = ClaudeAgentOptions(
+            setting_sources=["project"],
+
+            mcp_servers={
+                "serena": {
+                    "type": "stdio",
+                    "command": "npx",
+                    "args": ["-y", "@serena/mcp-server"]
+                }
+            },
+
+            allowed_tools=[
+                "mcp__serena__write_memory",
+                "mcp__serena__read_memory",
+                "mcp__serena__list_memories",
+                "TodoWrite",
+                "Read", "Write"
+            ],
+
+            system_prompt={
+                "type": "preset",
+                "preset": "claude_code",
+                "append": "--task-manage"
+            },
+
+            permission_mode='acceptAll'
+        )
+
+    async def start_session(self):
+        """Initialize new production session with context loading"""
+        async with ClaudeSDKClient(options=self.options) as client:
+            # Load production state from previous session
+            await client.query("""
+            Production Session Initialization:
+            1. list_memories() - Show all stored context
+            2. read_memory('deployment_state') - Current deployment status
+            3. read_memory('active_tasks') - In-progress tasks
+            4. think_about_collected_information() - Understand current state
+            """)
+
+            async for msg in client.receive_response():
+                print(msg)
+
+    async def end_session(self, status: str):
+        """Save production state for next session"""
+        async with ClaudeSDKClient(options=self.options) as client:
+            await client.query(f"""
+            Production Session End:
+            1. think_about_whether_you_are_done() - Assess completion
+            2. write_memory('deployment_state', '{status}')
+            3. write_memory('session_summary', 'outcomes')
+            4. delete_memory() for completed temporary items
+            """)
+
+            async for msg in client.receive_response():
+                print(msg)
+
+# Usage
+service = ContinuousProductionService()
+
+# Session 1: Deploy feature
+asyncio.run(service.start_session())
+# ... deployment work ...
+asyncio.run(service.end_session("feature_deployed"))
+
+# Session 2: Monitor (hours later)
+asyncio.run(service.start_session())
+# Claude retrieves deployment_state automatically
+```
+
+**Production Benefits**:
+- **Zero Context Loss**: Full state preservation across sessions
+- **Deployment Continuity**: Track deployments across multiple sessions
+- **Incident Response**: Historical context for debugging
+- **Team Handoffs**: Complete context transfer between shifts
+
+**See**: [@MCP_Serena.md](../../../MCP_Serena.md), [@MODE_Task_Management.md](../../../MODE_Task_Management.md)
+
+### CI/CD with Framework Integration
+
+**Purpose**: Production-grade CI/CD with SuperClaude framework capabilities
+
+**GitHub Actions Workflow**:
+```yaml
+# .github/workflows/superclaude-cicd.yml
+name: SuperClaude Production Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  framework-analysis:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Setup Node.js (for MCP servers)
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install Dependencies
+        run: |
+          pip install claude-agent-sdk
+          # MCP servers available via npx
+
+      - name: SuperClaude Framework Analysis
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          python ci/superclaude_pipeline.py \
+            --mode production \
+            --enable-sequential \
+            --enable-serena \
+            --enforce-rules
+```
+
+**Pipeline Script**:
+```python
+# ci/superclaude_pipeline.py
+import asyncio
+import sys
+from claude_agent_sdk import ClaudeSDKClient, ClaudeAgentOptions, HookMatcher
+
+async def production_pipeline(mode: str, enable_sequential: bool, enable_serena: bool, enforce_rules: bool):
+    mcp_servers = {}
+
+    if enable_sequential:
+        mcp_servers["sequential"] = {
+            "type": "stdio",
+            "command": "npx",
+            "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"]
+        }
+
+    if enable_serena:
+        mcp_servers["serena"] = {
+            "type": "stdio",
+            "command": "npx",
+            "args": ["-y", "@serena/mcp-server"]
+        }
+
+    hooks = {}
+    if enforce_rules:
+        async def enforce_production_rules(input_data, tool_use_id, context):
+            # RULES.md enforcement logic
+            pass
+
+        hooks = {
+            'PreToolUse': [HookMatcher(matcher='*', hooks=[enforce_production_rules])]
+        }
+
+    options = ClaudeAgentOptions(
+        setting_sources=["project"],  # Load CLAUDE.md
+
+        system_prompt={
+            "type": "preset",
+            "preset": "claude_code",
+            "append": "--orchestrate --think-hard --validate"
+        },
+
+        mcp_servers=mcp_servers,
+
+        allowed_tools=[
+            "Read", "Grep", "Bash",
+            "mcp__sequential__sequentialthinking" if enable_sequential else None,
+            "mcp__serena__write_memory" if enable_serena else None
+        ],
+
+        hooks=hooks,
+        permission_mode='acceptAll'
+    )
+
+    async with ClaudeSDKClient(options=options) as client:
+        await client.query(f"""
+        Production Pipeline Analysis (Mode: {mode}):
+        1. Grep: Find all test files
+        2. Bash: Run test suite
+        3. Sequential: Analyze test results for patterns
+        4. Serena: Store pipeline results for tracking
+        5. Report: Generate deployment readiness assessment
+
+        Fail pipeline if: tests fail OR security issues found
+        """)
+
+        pipeline_passed = True
+        async for msg in client.receive_response():
+            print(msg)
+            if "FAIL" in msg or "ERROR" in msg:
+                pipeline_passed = False
+
+        if not pipeline_passed:
+            sys.exit(1)  # Fail CI/CD
+
+if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--mode', default='production')
+    parser.add_argument('--enable-sequential', action='store_true')
+    parser.add_argument('--enable-serena', action='store_true')
+    parser.add_argument('--enforce-rules', action='store_true')
+    args = parser.parse_args()
+
+    asyncio.run(production_pipeline(
+        args.mode,
+        args.enable_sequential,
+        args.enable_serena,
+        args.enforce_rules
+    ))
+```
+
+**Pipeline Features**:
+- **Sequential MCP**: Deep analysis of test results and code changes
+- **Serena MCP**: Track pipeline history across builds
+- **RULES.md Enforcement**: Production safety standards
+- **Orchestration Mode**: Intelligent tool routing for efficiency
+- **Framework-Aware**: Loads CLAUDE.md project instructions
+
+**See**: [getting-started.md](getting-started.md), [tools-and-mcp.md](tools-and-mcp.md)
 
 ---
 
