@@ -1,90 +1,210 @@
-/* Custom Styles for Claude Agent SDK Documentation */
+/* Claude Agent SDK Documentation - Enhanced Dark Mode Styling */
 
-/* Root variables for consistent theming */
 :root {
   --claude-purple: #7c3aed;
+  --claude-purple-light: #a78bfa;
+  --claude-purple-dark: #5b21b6;
   --claude-amber: #f59e0b;
-  --code-bg-light: #f8f9fa;
-  --code-bg-dark: #1e1e1e;
+  --claude-amber-light: #fbbf24;
+  --accent-glow: rgba(124, 58, 237, 0.3);
 }
 
-/* Enhanced code blocks */
-.highlight {
-  border-radius: 0.5rem;
-  margin: 1.5em 0;
+/* Dark mode enhancements */
+[data-md-color-scheme="slate"] {
+  --md-primary-fg-color: #7c3aed;
+  --md-accent-fg-color: #f59e0b;
+
+  /* Custom dark background */
+  --md-default-bg-color: #0f0f1a;
+  --md-default-fg-color: #e4e4e7;
+
+  /* Code blocks */
+  --md-code-bg-color: #1a1a2e;
+  --md-code-fg-color: #e4e4e7;
+
+  /* Sidebar */
+  --md-primary-bg-color: #16162a;
+  --md-primary-fg-color--dark: #a78bfa;
 }
 
-/* Syntax highlighting improvements */
-.highlight pre {
+/* Smooth dark background gradient */
+[data-md-color-scheme="slate"] .md-main {
+  background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 100%);
+}
+
+/* Enhanced sidebar for dark mode */
+[data-md-color-scheme="slate"] .md-sidebar {
+  background: linear-gradient(180deg, #16162a 0%, #1a1a2e 100%);
+  border-right: 1px solid rgba(124, 58, 237, 0.2);
+}
+
+/* Glowing navigation items on hover */
+[data-md-color-scheme="slate"] .md-nav__link:hover {
+  background: linear-gradient(90deg, rgba(124, 58, 237, 0.2), transparent);
+  border-left: 3px solid var(--claude-purple);
+  padding-left: 0.8rem;
+  transition: all 0.3s ease;
+}
+
+/* Active navigation item */
+[data-md-color-scheme="slate"] .md-nav__link--active {
+  background: linear-gradient(90deg, rgba(124, 58, 237, 0.3), transparent);
+  border-left: 3px solid var(--claude-amber);
+  color: var(--claude-amber-light) !important;
+  font-weight: 600;
+}
+
+/* Code block styling with glow */
+[data-md-color-scheme="slate"] .highlight pre {
+  background: #1a1a2e !important;
+  border: 1px solid rgba(124, 58, 237, 0.3);
   border-left: 4px solid var(--claude-purple);
-  padding-left: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.1);
 }
 
-/* Improved table styling */
-table {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  border-radius: 0.5rem;
+/* Inline code */
+[data-md-color-scheme="slate"] code {
+  background: rgba(124, 58, 237, 0.15);
+  color: var(--claude-purple-light);
+  border: 1px solid rgba(124, 58, 237, 0.3);
+  border-radius: 4px;
+  padding: 0.1em 0.4em;
+}
+
+/* Headers with gradient */
+[data-md-color-scheme="slate"] .md-typeset h1 {
+  background: linear-gradient(135deg, var(--claude-purple-light), var(--claude-amber));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 700;
+}
+
+[data-md-color-scheme="slate"] .md-typeset h2 {
+  color: var(--claude-purple-light);
+  border-bottom: 2px solid rgba(124, 58, 237, 0.3);
+  padding-bottom: 0.5rem;
+}
+
+[data-md-color-scheme="slate"] .md-typeset h3 {
+  color: var(--claude-amber-light);
+}
+
+/* Admonitions (note, warning, etc) */
+[data-md-color-scheme="slate"] .md-typeset .admonition {
+  border: 1px solid rgba(124, 58, 237, 0.3);
+  border-left: 4px solid var(--claude-purple);
+  background: rgba(124, 58, 237, 0.05);
+  border-radius: 6px;
+}
+
+/* Links with glow effect */
+[data-md-color-scheme="slate"] .md-typeset a {
+  color: var(--claude-purple-light);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: all 0.3s ease;
+}
+
+[data-md-color-scheme="slate"] .md-typeset a:hover {
+  color: var(--claude-amber-light);
+  border-bottom: 1px solid var(--claude-amber);
+  text-shadow: 0 0 8px rgba(245, 158, 11, 0.5);
+}
+
+/* Search box enhancement */
+[data-md-color-scheme="slate"] .md-search__input {
+  background: rgba(124, 58, 237, 0.1);
+  border: 1px solid rgba(124, 58, 237, 0.3);
+  border-radius: 8px;
+}
+
+[data-md-color-scheme="slate"] .md-search__input:focus {
+  border-color: var(--claude-purple);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
+}
+
+/* Table styling */
+[data-md-color-scheme="slate"] .md-typeset table:not([class]) {
+  border: 1px solid rgba(124, 58, 237, 0.3);
+  border-radius: 6px;
   overflow: hidden;
 }
 
-/* Enhanced admonitions */
-.admonition {
-  border-radius: 0.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.admonition.note {
-  border-left-color: var(--claude-purple);
-}
-
-.admonition.warning {
-  border-left-color: var(--claude-amber);
-}
-
-/* Navigation improvements */
-.md-nav__link--active {
+[data-md-color-scheme="slate"] .md-typeset table:not([class]) th {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.3), rgba(124, 58, 237, 0.1));
+  color: var(--claude-purple-light);
   font-weight: 600;
-  color: var(--claude-purple) !important;
 }
 
-/* Search highlighting */
-mark {
-  background-color: var(--claude-amber);
-  color: #000;
-  padding: 0.1em 0.3em;
-  border-radius: 0.25rem;
+[data-md-color-scheme="slate"] .md-typeset table:not([class]) tr:hover {
+  background: rgba(124, 58, 237, 0.05);
 }
 
-/* Footer customization */
-.md-footer {
-  background: linear-gradient(135deg, var(--claude-purple) 0%, #5b21b6 100%);
+/* Smooth scrollbar */
+[data-md-color-scheme="slate"] ::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+[data-md-color-scheme="slate"] ::-webkit-scrollbar-track {
+  background: #1a1a2e;
+}
+
+[data-md-color-scheme="slate"] ::-webkit-scrollbar-thumb {
+  background: var(--claude-purple);
+  border-radius: 5px;
+}
+
+[data-md-color-scheme="slate"] ::-webkit-scrollbar-thumb:hover {
+  background: var(--claude-purple-light);
+}
+
+/* Copy button enhancement */
+[data-md-color-scheme="slate"] .md-clipboard {
+  color: var(--claude-purple-light);
+}
+
+[data-md-color-scheme="slate"] .md-clipboard:hover {
+  color: var(--claude-amber);
+}
+
+/* Back to top button */
+[data-md-color-scheme="slate"] .md-top {
+  background: var(--claude-purple);
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.4);
+}
+
+[data-md-color-scheme="slate"] .md-top:hover {
+  background: var(--claude-purple-light);
+  transform: scale(1.1);
+}
+
+/* Footer */
+[data-md-color-scheme="slate"] .md-footer {
+  background: linear-gradient(135deg, #16162a 0%, #1a1a2e 100%);
+  border-top: 1px solid rgba(124, 58, 237, 0.3);
+}
+
+/* Announcement bar (if used) */
+[data-md-color-scheme="slate"] .md-banner {
+  background: linear-gradient(90deg, var(--claude-purple), var(--claude-purple-dark));
+}
+
+/* Light mode subtle improvements */
+[data-md-color-scheme="default"] .md-nav__link--active {
+  color: var(--claude-purple);
+  font-weight: 600;
+}
+
+[data-md-color-scheme="default"] .highlight pre {
+  border-left: 4px solid var(--claude-purple);
 }
 
 /* Smooth scrolling */
 html {
   scroll-behavior: smooth;
-}
-
-/* Copy button enhancement */
-button[data-clipboard-text] {
-  opacity: 0.7;
-  transition: opacity 0.2s;
-}
-
-button[data-clipboard-text]:hover {
-  opacity: 1;
-}
-
-/* Link styling */
-a {
-  transition: color 0.2s ease;
-}
-
-/* Responsive improvements */
-@media screen and (max-width: 76.1875em) {
-  .md-nav--primary .md-nav__title {
-    background-color: var(--claude-purple);
-  }
 }
 
 /* Custom badges for new content */
@@ -98,38 +218,4 @@ a {
   font-weight: 600;
   margin-left: 0.5rem;
   vertical-align: middle;
-}
-
-/* Code copy feedback */
-@keyframes copy-feedback {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.1);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
-button[data-clipboard-text].copied {
-  animation: copy-feedback 0.3s ease;
-}
-
-/* Performance metrics tables */
-.md-typeset table tbody tr:hover {
-  background-color: rgba(124, 58, 237, 0.05);
-  transition: background-color 0.2s ease;
-}
-
-/* Citation styling */
-sup a {
-  text-decoration: none;
-  color: var(--claude-purple);
-  font-weight: 600;
-}
-
-sup a:hover {
-  text-decoration: underline;
 }

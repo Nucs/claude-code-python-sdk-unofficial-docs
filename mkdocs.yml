@@ -1,4 +1,4 @@
-# MkDocs Configuration for Claude Agent SDK Documentation - Simple Working Version
+# MkDocs Configuration for Claude Agent SDK Documentation
 site_name: Claude Agent SDK Documentation
 site_description: Comprehensive guide to building AI agents with Claude Agent SDK
 site_author: Community Contributors
@@ -17,43 +17,46 @@ theme:
   name: material
   language: en
 
-  # Color Palette
+  # Color Palette - Dark mode focused
   palette:
-    # Light mode
-    - scheme: default
-      primary: deep purple
-      accent: amber
-      toggle:
-        icon: material/brightness-7
-        name: Switch to dark mode
-    # Dark mode
-    - scheme: slate
+    # Dark mode (default)
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
       primary: deep purple
       accent: amber
       toggle:
         icon: material/brightness-4
         name: Switch to light mode
+    # Light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: deep purple
+      accent: amber
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
 
   # Fonts
   font:
     text: Roboto
-    code: Roboto Mono
+    code: JetBrains Mono
 
-  # Features
+  # Features - Sidebar navigation
   features:
-    - navigation.instant      # Instant loading
-    - navigation.tracking     # URL tracking
-    - navigation.tabs         # Top-level tabs
-    - navigation.tabs.sticky  # Sticky tabs
-    - navigation.sections     # Section navigation
-    - navigation.expand       # Expand sections
-    - navigation.indexes      # Section index pages
-    - navigation.top          # Back to top button
-    - search.suggest          # Search suggestions
-    - search.highlight        # Highlight search terms
-    - content.tabs.link       # Link content tabs
-    - content.code.copy       # Copy code button
-    - toc.follow              # Follow TOC
+    - navigation.instant
+    - navigation.tracking
+    - navigation.sections
+    - navigation.expand
+    - navigation.indexes
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - search.share
+    - content.tabs.link
+    - content.code.copy
+    - content.code.annotate
+    - toc.follow
+    - toc.integrate
 
   # Logo and favicon
   icon:
@@ -64,39 +67,25 @@ theme:
 plugins:
   - search:
       lang: en
+      separator: '[\s\-,:!=\[\]()"/]+|(?!\b)(?=[A-Z][a-z])|\.(?!\d)|&[lg]t;'
 
-# Navigation
+# Navigation - Clean sidebar structure
 nav:
   - Home: index.md
   - Overview: overview.md
-  - Getting Started:
-    - Quick Start: getting-started.md
-    - Installation: getting-started.md#installation
-  - Core Concepts:
-    - Architecture: architecture.md
-    - Agent Loop: architecture.md#agent-loop
-    - Tools & MCP: tools-and-mcp.md
-  - API Reference:
-    - Complete API: api-reference.md
-    - Python SDK: api-reference.md#python-sdk
-    - TypeScript SDK: api-reference.md#typescript-sdk
-  - Real-World Examples:
-    - Use Cases: real-world-use-cases.md
-    - Enterprise: real-world-use-cases.md#enterprise-implementations
-    - Open Source: real-world-use-cases.md#open-source-community-projects
-  - Production:
-    - Deployment Patterns: production-patterns.md
-    - Security Best Practices: security.md
-    - Performance Optimization: performance-optimization.md
-  - Troubleshooting:
-    - Common Issues: troubleshooting.md
-    - FAQ: troubleshooting.md#common-issues
-  - Community:
-    - Resources: community-resources.md
-    - Contributing: community-resources.md#contributing
-    - References: references.md
+  - Getting Started: getting-started.md
+  - Architecture: architecture.md
+  - Tools & MCP: tools-and-mcp.md
+  - API Reference: api-reference.md
+  - Real-World Use Cases: real-world-use-cases.md
+  - Production Patterns: production-patterns.md
+  - Security: security.md
+  - Performance: performance-optimization.md
+  - Troubleshooting: troubleshooting.md
+  - Community: community-resources.md
+  - References: references.md
 
-# Extensions
+# Markdown Extensions
 markdown_extensions:
   - pymdownx.highlight:
       anchor_linenums: true
@@ -104,14 +93,27 @@ markdown_extensions:
       pygments_lang_class: true
   - pymdownx.inlinehilite
   - pymdownx.snippets
-  - pymdownx.superfences
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
   - admonition
   - pymdownx.details
   - tables
   - attr_list
   - md_in_html
+  - def_list
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
   - toc:
       permalink: true
+      toc_depth: 3
 
 # Extra CSS/JS
 extra_css:
@@ -125,3 +127,4 @@ extra:
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/Nucs/claude-code-python-sdk-unofficial-docs
+  generator: false
