@@ -388,7 +388,7 @@ options = ClaudeAgentOptions(
 
 ## SuperClaude Framework MCP Servers
 
-The SuperClaude framework provides specialized MCP servers for advanced capabilities. **See**: [@CLAUDE.md](../../../CLAUDE.md)
+The SuperClaude framework provides specialized MCP servers for advanced capabilities. **See**: [CLAUDE.md](../../../CLAUDE.md)
 
 ### Sequential MCP (Structured Reasoning)
 
@@ -1119,7 +1119,7 @@ options = ClaudeAgentOptions(
 )
 ```
 
-**See**: [@RULES.md](../../../RULES.md)
+**See**: [RULES.md](../../../RULES.md)
 
 **Pattern 5: Cross-Session Task Management**:
 ```python

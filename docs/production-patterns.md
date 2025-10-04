@@ -257,7 +257,7 @@ class AgentOrchestrator:
 
 ## SuperClaude Framework Production Integration
 
-Production patterns for SuperClaude framework deployment with enterprise-grade reliability. **See**: [@CLAUDE.md](../../../CLAUDE.md)
+Production patterns for SuperClaude framework deployment with enterprise-grade reliability. **See**: [CLAUDE.md](../../../CLAUDE.md)
 
 ### Framework-Aware Production Service
 
@@ -395,7 +395,7 @@ if __name__ == "__main__":
 - **Orchestration Mode**: Automatic tool selection optimization [@MODE_Orchestration.md](../../../MODE_Orchestration.md)
 - **Sequential MCP**: Deep analysis for complex production issues [@MCP_Sequential.md](../../../MCP_Sequential.md)
 - **Serena MCP**: Cross-session context preservation [@MCP_Serena.md](../../../MCP_Serena.md)
-- **RULES.md Enforcement**: Production safety standards [@RULES.md](../../../RULES.md)
+- **RULES.md Enforcement**: Production safety standards [RULES.md](../../../RULES.md)
 - **Token Efficiency**: Optimized production costs [@MODE_Token_Efficiency.md](../../../MODE_Token_Efficiency.md)
 
 ### Cross-Session Production Continuity

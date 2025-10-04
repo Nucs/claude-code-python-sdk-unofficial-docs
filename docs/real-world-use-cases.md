@@ -1035,8 +1035,8 @@ Claude Flow v2 is an enterprise-grade AI orchestration platform combining hive-m
 - [@production-patterns.md](production-patterns.md) - Production deployment strategies
 - [@api-reference.md](api-reference.md) - Complete SDK API documentation
 - [@SDK_Python.md](../SDK_Python.md) - Python SDK with SuperClaude integration
-- [@CLAUDE.md](../CLAUDE.md) - Framework architecture and components
+- [CLAUDE.md](../CLAUDE.md) - Framework architecture and components
 - [@MODE_Task_Management.md](../MODE_Task_Management.md) - Task organization patterns
 - [@MODE_Orchestration.md](../MODE_Orchestration.md) - Multi-tool coordination
-- [@RULES.md](../RULES.md) - Safety and quality standards
-- [@PRINCIPLES.md](../PRINCIPLES.md) - Engineering principles
+- [RULES.md](../RULES.md) - Safety and quality standards
+- [PRINCIPLES.md](../PRINCIPLES.md) - Engineering principles

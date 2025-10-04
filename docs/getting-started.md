@@ -226,7 +226,7 @@ The Claude Agent SDK integrates seamlessly with the **SuperClaude framework** - 
 
 ### Core Framework Components
 
-**See**: [@CLAUDE.md](../../../CLAUDE.md) for complete architecture
+**See**: [CLAUDE.md](../../../CLAUDE.md) for complete architecture
 
 #### 1. CLAUDE.md (Repository Instructions)
 - Project-specific instructions and architecture
@@ -235,8 +235,8 @@ The Claude Agent SDK integrates seamlessly with the **SuperClaude framework** - 
 - Automatically loaded when `setting_sources=["project"]`
 
 #### 2. MODE System (Behavioral Modes)
-- [@MODE_Task_Management.md](../../../MODE_Task_Management.md) - TodoWrite integration, memory persistence
-- [@MODE_Orchestration.md](../../../MODE_Orchestration.md) - Tool selection optimization
+- [MODE_Task_Management.md](../../../MODE_Task_Management.md) - TodoWrite integration, memory persistence
+- [MODE_Orchestration.md](../../../MODE_Orchestration.md) - Tool selection optimization
 - [@MODE_Token_Efficiency.md](../../../MODE_Token_Efficiency.md) - Symbol-based compression
 - [@MODE_Introspection.md](../../../MODE_Introspection.md) - Meta-cognitive analysis
 - [@MODE_Brainstorming.md](../../../MODE_Brainstorming.md) - Requirements discovery
@@ -253,8 +253,8 @@ Activate modes via system prompt flags: `--task-manage`, `--orchestrate`, `--uc`
 - [@MCP_Playwright.md](../../../MCP_Playwright.md) - Browser automation & E2E testing
 
 #### 4. RULES.md & PRINCIPLES.md
-- [@RULES.md](../../../RULES.md) - Safety, quality, and workflow rules
-- [@PRINCIPLES.md](../../../PRINCIPLES.md) - SOLID, DRY, KISS engineering principles
+- [RULES.md](../../../RULES.md) - Safety, quality, and workflow rules
+- [PRINCIPLES.md](../../../PRINCIPLES.md) - SOLID, DRY, KISS engineering principles
 
 ### Quick Setup with SuperClaude
 
@@ -534,7 +534,7 @@ anyio.run(main)
 - Follows RULES.md safety and quality standards
 - Uses framework-aware file organization
 
-**See**: [@CLAUDE.md](../../../CLAUDE.md), [@PRINCIPLES.md](../../../PRINCIPLES.md), [@RULES.md](../../../RULES.md)
+**See**: [CLAUDE.md](../../../CLAUDE.md), [PRINCIPLES.md](../../../PRINCIPLES.md), [RULES.md](../../../RULES.md)
 
 ### Example 9: MODE Activation
 
@@ -577,8 +577,8 @@ anyio.run(main)
 ```
 
 **MODE Behaviors**:
-- `--task-manage`: Activates TodoWrite tracking, memory persistence [@MODE_Task_Management.md](../../../MODE_Task_Management.md)
-- `--orchestrate`: Optimizes tool selection and parallel execution [@MODE_Orchestration.md](../../../MODE_Orchestration.md)
+- `--task-manage`: Activates TodoWrite tracking, memory persistence [MODE_Task_Management.md](../../../MODE_Task_Management.md)
+- `--orchestrate`: Optimizes tool selection and parallel execution [MODE_Orchestration.md](../../../MODE_Orchestration.md)
 - `--think-hard`: Enables Sequential MCP for deep analysis [@MODE_DeepResearch.md](../../../MODE_DeepResearch.md)
 - `--uc`: Ultra-compressed symbol communication [@MODE_Token_Efficiency.md](../../../MODE_Token_Efficiency.md)
 
@@ -728,7 +728,7 @@ anyio.run(session_2_continue)
 - Session 2: `read_memory()` retrieves context from previous session
 - Cross-session learning and context preservation
 
-**See**: [@MCP_Serena.md](../../../MCP_Serena.md), [@MODE_Task_Management.md](../../../MODE_Task_Management.md)
+**See**: [@MCP_Serena.md](../../../MCP_Serena.md), [MODE_Task_Management.md](../../../MODE_Task_Management.md)
 
 ### Example 12: Multi-MCP Orchestration
 
@@ -794,7 +794,7 @@ anyio.run(main)
 - **Context7**: Official React documentation and patterns [@MCP_Context7.md](../../../MCP_Context7.md)
 - **Sequential**: Structured analysis and planning [@MCP_Sequential.md](../../../MCP_Sequential.md)
 - **Magic**: Production-ready UI component generation [@MCP_Magic.md](../../../MCP_Magic.md)
-- **Orchestration Mode**: Intelligent tool routing and optimization [@MODE_Orchestration.md](../../../MODE_Orchestration.md)
+- **Orchestration Mode**: Intelligent tool routing and optimization [MODE_Orchestration.md](../../../MODE_Orchestration.md)
 
 ### Example 13: RULES.md Enforcement via Hooks
 
@@ -866,7 +866,7 @@ anyio.run(main)
 - Code quality: Run tests before marking complete
 - Professional standards: No marketing language in technical docs
 
-**See**: [@RULES.md](../../../RULES.md), [api-reference.md#hooks-system](api-reference.md#hooks-system)
+**See**: [RULES.md](../../../RULES.md), [api-reference.md#hooks-system](api-reference.md#hooks-system)
 
 ### Example 14: Real-World Email Agent
 
