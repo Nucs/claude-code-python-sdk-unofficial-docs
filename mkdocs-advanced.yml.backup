@@ -1,0 +1,251 @@
+# MkDocs Configuration for Claude Agent SDK Documentation
+site_name: Claude Agent SDK Documentation
+site_description: Comprehensive guide to building AI agents with Claude Agent SDK
+site_author: Community Contributors
+site_url: https://Nucs.github.io/claude-code-python-sdk-unofficial-docs/
+
+# Repository
+repo_name: Nucs/claude-code-python-sdk-unofficial-docs
+repo_url: https://github.com/Nucs/claude-code-python-sdk-unofficial-docs
+edit_uri: edit/main/docs/
+
+# Copyright
+copyright: Copyright &copy; 2025 Claude Agent SDK Community
+
+# Theme Configuration
+theme:
+  name: material
+  language: en
+
+  # Color Palette
+  palette:
+    # Light mode
+    - scheme: default
+      primary: deep purple
+      accent: amber
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    # Dark mode
+    - scheme: slate
+      primary: deep purple
+      accent: amber
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+  # Fonts
+  font:
+    text: Roboto
+    code: Roboto Mono
+
+  # Features
+  features:
+    - navigation.instant      # Instant loading
+    - navigation.tracking     # URL tracking
+    - navigation.tabs         # Top-level tabs
+    - navigation.tabs.sticky  # Sticky tabs
+    - navigation.sections     # Section navigation
+    - navigation.expand       # Expand sections
+    - navigation.indexes      # Section index pages
+    - navigation.top          # Back to top button
+    - search.suggest          # Search suggestions
+    - search.highlight        # Search highlighting
+    - search.share           # Share search results
+    - header.autohide        # Auto-hide header
+    - content.code.copy      # Copy code button
+    - content.code.annotate  # Code annotations
+
+  # Logo and Icons
+  icon:
+    repo: fontawesome/brands/github
+    edit: material/pencil
+    view: material/eye
+
+# Navigation Structure
+nav:
+  - Home: index.md
+  - Getting Started:
+    - Overview: overview.md
+    - Quick Start: getting-started.md
+    - Installation: getting-started.md#installation
+  - Core Concepts:
+    - Architecture: architecture.md
+    - Agent Loop: architecture.md#agent-loop
+    - Tools & MCP: tools-and-mcp.md
+  - API Reference:
+    - Complete API: api-reference.md
+    - Python SDK: api-reference.md#python-sdk
+    - TypeScript SDK: api-reference.md#typescript-sdk
+  - Real-World Examples:
+    - Use Cases: real-world-use-cases.md
+    - Enterprise: real-world-use-cases.md#enterprise-implementations
+    - Open Source: real-world-use-cases.md#open-source-community-projects
+  - Production:
+    - Deployment Patterns: production-patterns.md
+    - Security Best Practices: security.md
+    - Performance Optimization: performance-optimization.md
+  - Troubleshooting:
+    - Common Issues: troubleshooting.md
+    - FAQ: troubleshooting.md#common-issues
+  - Community:
+    - Resources: community-resources.md
+    - Contributing: community-resources.md#contributing
+    - References: references.md
+
+# Plugins
+plugins:
+  - search:
+      lang: en
+      separator: '[\s\-,:!=\[\]()"/]+|(?!\b)(?=[A-Z][a-z])|\.(?!\d)|&[lg]t;'
+
+  # PDF Export - Generate downloadable PDF
+  - pdf-export:
+      combined: true
+      combined_output_path: pdf/claude-agent-sdk-complete-guide.pdf
+      media_type: print
+      enabled_if_env: ENABLE_PDF_EXPORT
+
+  # Alternative PDF generation with better styling
+  - with-pdf:
+      author: Claude Agent SDK Community
+      copyright: Copyright &copy; 2025 Claude Agent SDK Community
+      cover_title: Claude Agent SDK
+      cover_subtitle: Complete Documentation Guide
+      output_path: pdf/claude-agent-sdk-documentation.pdf
+      enabled_if_env: ENABLE_PDF_EXPORT
+
+  # Git information
+  - git-revision-date-localized:
+      enable_creation_date: true
+      type: timeago
+
+  - git-authors:
+      show_contribution: true
+      show_line_count: true
+
+  # Macros for variables and dynamic content
+  - macros
+
+  # Redirects for URL management
+  - redirects:
+      redirect_maps:
+        'INDEX.md': 'index.md'
+
+  # Awesome pages for better navigation
+  - awesome-pages
+
+  # Minification (keep at end)
+  - minify:
+      minify_html: true
+      minify_js: true
+      minify_css: true
+
+# Extensions
+markdown_extensions:
+  # Python Markdown
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+      toc_depth: 3
+
+  # Python Markdown Extensions
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+# Extra Configuration
+extra:
+  # Social Links
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/anthropics/claude-agent-sdk-python
+      name: Python SDK on GitHub
+    - icon: fontawesome/brands/github
+      link: https://github.com/anthropics/claude-agent-sdk-typescript
+      name: TypeScript SDK on GitHub
+    - icon: fontawesome/brands/discord
+      link: https://discord.gg/anthropic
+      name: Join Discord Community
+    - icon: fontawesome/brands/twitter
+      link: https://twitter.com/AnthropicAI
+      name: Follow on Twitter
+
+  # Analytics (uncomment and add your GA4 ID)
+  # analytics:
+  #   provider: google
+  #   property: G-XXXXXXXXXX
+  #   feedback:
+  #     title: Was this page helpful?
+  #     ratings:
+  #       - icon: material/emoticon-happy-outline
+  #         name: This page was helpful
+  #         data: 1
+  #         note: Thanks for your feedback!
+  #       - icon: material/emoticon-sad-outline
+  #         name: This page could be improved
+  #         data: 0
+  #         note: Thanks for your feedback!
+
+  # Version management
+  version:
+    provider: mike
+    default: latest
+
+  # Download buttons for PDF
+  alternate:
+    - name: Download PDF
+      link: /pdf/claude-agent-sdk-documentation.pdf
+      lang: en
+
+  # Status badges
+  status:
+    new: Recently added
+    deprecated: Deprecated
+
+  # Custom variables for macros
+  vars:
+    total_sources: 127
+    total_case_studies: 28
+    total_examples: 10
+    github_stars: "1.6k+"
+    enterprise_users: "57,000+"
+
+# Extra CSS/JS
+extra_css:
+  - stylesheets/extra.css
+
+extra_javascript:
+  - javascripts/extra.js
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
