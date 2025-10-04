@@ -1,0 +1,25 @@
+# MkDocs and Theme
+mkdocs>=1.5.3
+mkdocs-material>=9.5.0
+
+# Plugins
+mkdocs-minify-plugin>=0.8.0
+mkdocs-pdf-export-plugin>=0.5.10
+mkdocs-with-pdf>=0.9.3
+mike>=2.0.0
+
+# Advanced Features
+mkdocs-git-revision-date-localized-plugin>=1.2.4
+mkdocs-git-authors-plugin>=0.7.2
+mkdocs-macros-plugin>=1.0.5
+mkdocs-redirects>=1.2.1
+mkdocs-awesome-pages-plugin>=2.9.2
+
+# Extensions for enhanced markdown
+pymdown-extensions>=10.7
+pygments>=2.17.0
+
+# Additional utilities
+markdown>=3.5.0
+Pillow>=10.0.0
+weasyprint>=60.0

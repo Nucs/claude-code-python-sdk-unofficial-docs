@@ -1,0 +1,74 @@
+name: Sync to GitHub Wiki
+
+# Automatically sync documentation to GitHub Wiki
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'docs/**'
+  workflow_dispatch:  # Allow manual trigger
+
+permissions:
+  contents: write
+
+jobs:
+  sync-wiki:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Sync to Wiki
+        uses: Andrew-Chen-Wang/github-wiki-action@v4
+        with:
+          path: 'docs/'
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Add Wiki navigation
+        run: |
+          # Create _Sidebar.md for wiki navigation
+          cat << 'EOF' > _Sidebar.md
+          ## 📚 Claude Agent SDK Docs
+
+          ### Getting Started
+          * [Home](Home)
+          * [Overview](overview)
+          * [Quick Start](getting-started)
+
+          ### Core Concepts
+          * [Architecture](architecture)
+          * [Tools & MCP](tools-and-mcp)
+          * [API Reference](api-reference)
+
+          ### Examples
+          * [Real-World Use Cases](real-world-use-cases)
+          * [Production Patterns](production-patterns)
+
+          ### Guides
+          * [Security](security)
+          * [Performance](performance-optimization)
+          * [Troubleshooting](troubleshooting)
+
+          ### Community
+          * [Resources](community-resources)
+          * [References](references)
+
+          ---
+
+          📖 **[Full Documentation Site](https://Nucs.github.io/claude-code-python-sdk-unofficial-docs/)**
+          EOF
+
+          # Create _Footer.md
+          cat << 'EOF' > _Footer.md
+          ---
+
+          📝 **Last Updated:** $(date +"%Y-%m-%d")
+
+          🌐 **Main Site:** [https://Nucs.github.io/claude-code-python-sdk-unofficial-docs/](https://Nucs.github.io/claude-code-python-sdk-unofficial-docs/)
+
+          🤝 **Contribute:** [Edit this page](https://github.com/Nucs/claude-code-python-sdk-unofficial-docs/wiki)
+          EOF

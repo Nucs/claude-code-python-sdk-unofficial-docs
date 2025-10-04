@@ -1,0 +1,104 @@
+name: Deploy Documentation with PDF
+
+# Enhanced deployment with PDF generation
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages-pdf"
+  cancel-in-progress: false
+
+jobs:
+  # Build job with PDF generation
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Build documentation
+        run: mkdocs build --strict
+
+      - name: Build PDF
+        env:
+          ENABLE_PDF_EXPORT: 1
+        run: |
+          # Rebuild with PDF export enabled
+          mkdocs build
+
+          # Create PDF directory in site
+          mkdir -p site/pdf
+
+          # Check if PDF was generated
+          if [ -f "site/pdf/claude-agent-sdk-documentation.pdf" ]; then
+            echo "✅ PDF generated successfully"
+            ls -lh site/pdf/
+          else
+            echo "⚠️ PDF generation may have failed, continuing anyway"
+          fi
+
+      - name: Add download links
+        run: |
+          # Add PDF download button to index
+          if [ -f "site/pdf/claude-agent-sdk-documentation.pdf" ]; then
+            cat >> site/index.html << 'EOF'
+            <script>
+            // Add PDF download button
+            document.addEventListener('DOMContentLoaded', function() {
+              const header = document.querySelector('.md-header__inner');
+              if (header) {
+                const pdfBtn = document.createElement('a');
+                pdfBtn.href = '/claude-code-python-sdk-unofficial-docs/pdf/claude-agent-sdk-documentation.pdf';
+                pdfBtn.className = 'md-button md-button--primary';
+                pdfBtn.innerHTML = '📄 Download PDF';
+                pdfBtn.style.marginLeft = '10px';
+                header.appendChild(pdfBtn);
+              }
+            });
+            </script>
+            EOF
+          fi
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./site
+
+  # Deploy job
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Summary
+        run: |
+          echo "✅ Documentation deployed successfully!"
+          echo "🌐 Site: ${{ steps.deployment.outputs.page_url }}"
+          echo "📄 PDF: ${{ steps.deployment.outputs.page_url }}pdf/claude-agent-sdk-documentation.pdf"
