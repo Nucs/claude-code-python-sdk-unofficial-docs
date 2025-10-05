@@ -454,6 +454,8 @@ class ClaudeAgentOptions:
 
     # Environment
     model: str | None = None
+    api_key: str | None = None
+    max_tokens: int | None = None
     cwd: str | Path | None = None
     env: dict[str, str] = field(default_factory=dict)
     add_dirs: list[str | Path] = field(default_factory=list)
@@ -481,6 +483,10 @@ class ClaudeAgentOptions:
 | `agents` | `dict[str, AgentDefinition] \| None` | `None` | Programmatically defined subagents |
 | `can_use_tool` | `CanUseTool \| None` | `None` | Tool permission callback function |
 | `hooks` | `dict[HookEvent, list[HookMatcher]] \| None` | `None` | Hook configurations |
+| `model` | `str \| None` | `None` | Model to use (overrides default) |
+| `api_key` | `str \| None` | `None` | Anthropic API key (overrides ANTHROPIC_API_KEY env var) |
+| `max_tokens` | `int \| None` | `None` | Maximum tokens for completion (controls response length and cost) |
+| `cwd` | `str \| Path \| None` | `None` | Working directory for operations |
 
 **SuperClaude Framework Configuration Examples**:
 
@@ -526,7 +532,30 @@ options = ClaudeAgentOptions(
     setting_sources=["project"],  # Loads .claude/settings.json and Claude Configuration
     system_prompt={"type": "preset", "preset": "claude_code"}
 )
+
+# API Key Override (Multi-Tenant Systems)
+options = ClaudeAgentOptions(
+    api_key=get_tenant_api_key(tenant_id),  # Different key per tenant
+    max_tokens=4096  # Control response length and cost
+)
+
+# Cost Control with max_tokens
+options = ClaudeAgentOptions(
+    max_tokens=2000,  # Limit response length for cost optimization
+    model="claude-sonnet-4-20250514"
+)
 ```
+
+**API Key Priority**:
+1. `api_key` parameter in ClaudeAgentOptions (highest priority)
+2. `ANTHROPIC_API_KEY` environment variable
+3. Error if neither is set
+
+**max_tokens Usage**:
+- Controls maximum completion length
+- Affects API cost (longer responses = higher cost)
+- Useful for cost optimization in production
+- Typical values: 1024 (short), 4096 (medium), 16384 (long)
 
 ---
 

@@ -779,6 +779,66 @@ anyio.run(streaming_example)
 - Messages arrive incrementally for real-time display
 - Better user experience for long-running tasks
 
+### Example 11a: Message Accumulation Pattern
+
+**Source**: Real-world implementation pattern from DJ agent system
+
+**Purpose**: Accumulate complete response text for processing
+
+```python
+import anyio
+from claude_agent_sdk import query, ClaudeAgentOptions, AssistantMessage, TextBlock
+
+async def accumulate_response():
+    """Collect full response text for post-processing."""
+
+    options = ClaudeAgentOptions(
+        system_prompt="You are a helpful code analysis assistant.",
+        allowed_tools=["Read", "Grep"],
+        max_tokens=2000
+    )
+
+    # Accumulate all response text
+    full_response = ""
+
+    async for message in query(
+        prompt="Analyze the authentication module and provide a summary",
+        options=options
+    ):
+        if isinstance(message, AssistantMessage):
+            for block in message.content:
+                if isinstance(block, TextBlock):
+                    full_response += block.text
+
+    # Process accumulated response
+    return full_response
+
+async def main():
+    result = await accumulate_response()
+
+    # Now you can process the complete response
+    word_count = len(result.split())
+    print(f"Analysis complete: {word_count} words")
+    print(f"\nFull response:\n{result}")
+
+anyio.run(main)
+```
+
+**Use Cases**:
+- Post-processing analysis (word count, sentiment, etc.)
+- Database storage of complete responses
+- Multi-step workflows requiring full context
+- Logging and audit trails
+- Batch processing of multiple queries
+
+**Pattern Comparison**:
+
+| Pattern | Use Case | Example |
+|---------|----------|---------|
+| **Real-time Display** | Interactive UX | `print(block.text, end='', flush=True)` |
+| **Accumulation** | Post-processing | `full_response += block.text` |
+| **Hybrid** | Both display + storage | Combine both patterns |
+
 ### Example 12: Setting Sources Configuration
 
 **Source**: `examples/setting_sources.py` from official repository

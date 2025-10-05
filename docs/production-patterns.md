@@ -1250,6 +1250,383 @@ async def traced_query(query: str):
 
 ---
 
+## Error Handling & Resilience
+
+Production-ready error handling patterns for robust SDK deployments.
+
+### Exponential Backoff for Rate Limits
+
+**Pattern**: Retry with increasing delays to handle rate limits gracefully
+
+```python
+import asyncio
+from claude_agent_sdk import query, ClaudeAgentOptions, ProcessError
+import logging
+
+logger = logging.getLogger(__name__)
+
+async def query_with_retry(
+    prompt: str,
+    options: ClaudeAgentOptions | None = None,
+    max_retries: int = 3,
+    base_delay: float = 1.0
+):
+    """Production-ready query with exponential backoff for rate limits."""
+
+    for attempt in range(max_retries):
+        try:
+            response = []
+            async for message in query(prompt=prompt, options=options):
+                response.append(message)
+            return response
+
+        except ProcessError as e:
+            # Check if rate limit error
+            if "rate_limit" in str(e).lower() or "429" in str(e):
+                if attempt < max_retries - 1:
+                    # Exponential backoff: 1s, 2s, 4s, 8s...
+                    wait_time = base_delay * (2 ** attempt)
+                    logger.warning(
+                        f"Rate limited (attempt {attempt + 1}/{max_retries}). "
+                        f"Retrying in {wait_time}s..."
+                    )
+                    await asyncio.sleep(wait_time)
+                else:
+                    logger.error(f"Failed after {max_retries} retries due to rate limit")
+                    raise
+            else:
+                # Non-rate-limit error, re-raise immediately
+                logger.error(f"Query failed with non-rate-limit error: {e}")
+                raise
+
+    raise Exception(f"Failed after {max_retries} retries")
+
+
+# Usage
+async def main():
+    result = await query_with_retry(
+        prompt="Analyze authentication.py",
+        max_retries=5,
+        base_delay=1.0
+    )
+```
+
+**Benefits**:
+- Automatically handles temporary rate limits
+- Exponential backoff prevents thundering herd
+- Configurable retry attempts and delays
+- Distinguishes rate limits from other errors
+
+### Graceful Degradation
+
+**Pattern**: Fallback to simpler functionality when full SDK unavailable
+
+```python
+from claude_agent_sdk import (
+    ClaudeSDKClient,
+    ClaudeAgentOptions,
+    CLIConnectionError,
+    ProcessError,
+    query
+)
+
+async def resilient_code_analysis(file_path: str):
+    """Multi-tier fallback for code analysis."""
+
+    # Tier 1: Full SDK with tools (best quality)
+    try:
+        options = ClaudeAgentOptions(
+            allowed_tools=["Read", "Grep", "Bash"],
+            permission_mode="acceptEdits",
+            max_tokens=4096
+        )
+
+        async with ClaudeSDKClient(options=options) as client:
+            await client.query(f"Deep analysis of {file_path} with tools")
+
+            result = []
+            async for msg in client.receive_response():
+                result.append(msg)
+
+            logger.info("Tier 1: Full analysis successful")
+            return {"tier": 1, "result": result}
+
+    except CLIConnectionError:
+        logger.warning("Tier 1 failed: Claude CLI not available, falling back to Tier 2")
+
+    # Tier 2: Simple query without tools (medium quality)
+    try:
+        result = []
+        async for msg in query(prompt=f"Quick summary of {file_path}"):
+            result.append(msg)
+
+        logger.info("Tier 2: Simple query successful")
+        return {"tier": 2, "result": result}
+
+    except ProcessError:
+        logger.warning("Tier 2 failed: Process error, falling back to Tier 3")
+
+    # Tier 3: Static analysis fallback (basic quality)
+    logger.warning("All SDK tiers failed, using static analysis")
+    return {
+        "tier": 3,
+        "result": f"Static analysis of {file_path} (SDK unavailable)"
+    }
+
+
+# Usage
+async def main():
+    result = await resilient_code_analysis("/src/auth.py")
+    print(f"Analysis completed using Tier {result['tier']}")
+```
+
+**Tiers**:
+1. **Full SDK**: All tools, highest quality
+2. **Simple Query**: No tools, medium quality
+3. **Fallback**: Static analysis or cached data
+
+### Circuit Breaker Pattern
+
+**Pattern**: Prevent cascading failures by temporarily disabling failing operations
+
+```python
+from datetime import datetime, timedelta
+from enum import Enum
+
+class CircuitState(Enum):
+    CLOSED = "closed"      # Normal operation
+    OPEN = "open"          # Failing, reject requests
+    HALF_OPEN = "half_open"  # Testing recovery
+
+class CircuitBreaker:
+    """Circuit breaker for SDK operations."""
+
+    def __init__(
+        self,
+        failure_threshold: int = 5,
+        timeout: float = 60.0,
+        success_threshold: int = 2
+    ):
+        self.failure_threshold = failure_threshold
+        self.timeout = timeout
+        self.success_threshold = success_threshold
+
+        self.failure_count = 0
+        self.success_count = 0
+        self.last_failure_time = None
+        self.state = CircuitState.CLOSED
+
+    def _should_attempt(self) -> bool:
+        """Check if request should be attempted."""
+
+        if self.state == CircuitState.CLOSED:
+            return True
+
+        if self.state == CircuitState.OPEN:
+            # Check if timeout elapsed
+            if self.last_failure_time:
+                elapsed = (datetime.now() - self.last_failure_time).total_seconds()
+                if elapsed >= self.timeout:
+                    self.state = CircuitState.HALF_OPEN
+                    return True
+            return False
+
+        # HALF_OPEN state
+        return True
+
+    async def call(self, operation):
+        """Execute operation with circuit breaker protection."""
+
+        if not self._should_attempt():
+            raise Exception("Circuit breaker OPEN - request rejected")
+
+        try:
+            result = await operation()
+
+            # Success handling
+            if self.state == CircuitState.HALF_OPEN:
+                self.success_count += 1
+                if self.success_count >= self.success_threshold:
+                    self.state = CircuitState.CLOSED
+                    self.failure_count = 0
+                    self.success_count = 0
+                    logger.info("Circuit breaker CLOSED - recovered")
+
+            return result
+
+        except Exception as e:
+            # Failure handling
+            self.failure_count += 1
+            self.last_failure_time = datetime.now()
+
+            if self.failure_count >= self.failure_threshold:
+                self.state = CircuitState.OPEN
+                logger.error(f"Circuit breaker OPEN - {self.failure_count} failures")
+
+            raise
+
+
+# Usage
+circuit_breaker = CircuitBreaker(
+    failure_threshold=5,
+    timeout=60.0,
+    success_threshold=2
+)
+
+async def analyze_with_circuit_breaker(file_path: str):
+    """Code analysis with circuit breaker protection."""
+
+    async def operation():
+        result = []
+        async for msg in query(prompt=f"Analyze {file_path}"):
+            result.append(msg)
+        return result
+
+    try:
+        return await circuit_breaker.call(operation)
+    except Exception as e:
+        logger.error(f"Circuit breaker prevented call: {e}")
+        return None
+```
+
+**Benefits**:
+- Prevents cascading failures
+- Automatic recovery detection
+- Configurable thresholds and timeouts
+- Protects downstream systems
+
+### Timeout Management
+
+**Pattern**: Set appropriate timeouts for different operation types
+
+```python
+import asyncio
+from claude_agent_sdk import query, ClaudeAgentOptions
+
+async def query_with_timeout(
+    prompt: str,
+    timeout_seconds: float = 30.0,
+    options: ClaudeAgentOptions | None = None
+):
+    """Execute query with timeout protection."""
+
+    try:
+        result = await asyncio.wait_for(
+            _execute_query(prompt, options),
+            timeout=timeout_seconds
+        )
+        return result
+
+    except asyncio.TimeoutError:
+        logger.error(f"Query timed out after {timeout_seconds}s")
+        raise
+
+
+async def _execute_query(prompt: str, options: ClaudeAgentOptions | None):
+    """Internal query execution."""
+    result = []
+    async for msg in query(prompt=prompt, options=options):
+        result.append(msg)
+    return result
+
+
+# Usage with different timeout strategies
+async def main():
+    # Short timeout for simple queries
+    quick_result = await query_with_timeout(
+        "What is 2 + 2?",
+        timeout_seconds=10.0
+    )
+
+    # Longer timeout for complex analysis
+    analysis_result = await query_with_timeout(
+        "Perform deep code analysis",
+        timeout_seconds=120.0
+    )
+```
+
+**Timeout Recommendations**:
+- **Simple queries**: 10-30 seconds
+- **Code analysis**: 60-120 seconds
+- **Multi-file operations**: 120-300 seconds
+- **Tool-heavy workflows**: 300-600 seconds
+
+### Error Categorization
+
+**Pattern**: Classify and handle different error types appropriately
+
+```python
+from claude_agent_sdk import (
+    CLIConnectionError,
+    CLINotFoundError,
+    ProcessError,
+    CLIJSONDecodeError
+)
+
+class ErrorCategory(Enum):
+    TRANSIENT = "transient"      # Retry possible
+    PERMANENT = "permanent"      # Don't retry
+    CONFIGURATION = "configuration"  # Fix config
+
+def categorize_error(error: Exception) -> ErrorCategory:
+    """Categorize error for appropriate handling."""
+
+    if isinstance(error, CLINotFoundError):
+        return ErrorCategory.CONFIGURATION  # Claude CLI not installed
+
+    if isinstance(error, ProcessError):
+        if "rate_limit" in str(error).lower():
+            return ErrorCategory.TRANSIENT  # Rate limit - retry
+        if "context length" in str(error).lower():
+            return ErrorCategory.PERMANENT  # Too long - can't retry
+        return ErrorCategory.TRANSIENT  # Other process errors - retry
+
+    if isinstance(error, CLIJSONDecodeError):
+        return ErrorCategory.TRANSIENT  # Might be temporary
+
+    return ErrorCategory.PERMANENT
+
+
+async def handle_categorized_error(error: Exception) -> str:
+    """Handle error based on category."""
+
+    category = categorize_error(error)
+
+    if category == ErrorCategory.TRANSIENT:
+        logger.warning(f"Transient error: {error}. Retry recommended.")
+        return "retry"
+
+    elif category == ErrorCategory.CONFIGURATION:
+        logger.error(f"Configuration error: {error}. Fix required.")
+        return "fix_config"
+
+    else:  # PERMANENT
+        logger.error(f"Permanent error: {error}. Cannot retry.")
+        return "fail"
+
+
+# Usage
+async def robust_operation():
+    """Operation with categorized error handling."""
+
+    try:
+        result = await query_with_retry("Analyze code")
+        return result
+
+    except Exception as e:
+        action = await handle_categorized_error(e)
+
+        if action == "retry":
+            # Already handled by query_with_retry
+            pass
+        elif action == "fix_config":
+            raise Exception("Please install Claude CLI: npm install -g @anthropic-ai/claude-code")
+        else:  # fail
+            raise
+```
+
+---
+
 ## Cost Management
 
 Strategies for optimizing API costs in production.[^7]

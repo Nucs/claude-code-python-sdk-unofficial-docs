@@ -46,6 +46,9 @@ Enterprise deployment models, CLAUDE.md configuration management, security confi
 #### [Security](security.md)
 Security architecture, permission-based controls, known vulnerabilities (prompt injection, command injection, access control), mitigation strategies, OAuth 2.1 authentication, secure prompting practices, and compliance frameworks.
 
+#### [Testing Guide](testing-guide.md)
+Comprehensive testing patterns for Claude Agent SDK applications: unit testing custom tools, integration testing with mocks, ClaudeSDKClient workflow testing, MCP server testing, hook and callback testing, end-to-end testing strategies, performance testing, and CI/CD integration with pytest.
+
 #### [Performance Optimization](performance-optimization.md)
 Benchmark results (77.2% SWE-bench Verified score), model comparison analysis, pricing structures ($3/$15 per million tokens), cost optimization techniques (prompt caching, dynamic routing, context compaction), and performance tuning strategies.
 
