@@ -24,6 +24,34 @@
 
 Four primary patterns for production Claude Agent SDK deployment.[^1]
 
+```
+                    Production Deployment Architecture
+
+┌─────────────────────────────────────────────────────────────────────┐
+│                          Load Balancer                              │
+└────────────────────────────┬────────────────────────────────────────┘
+                             │
+            ┌────────────────┼────────────────┐
+            │                │                │
+   ┌────────▼────────┐  ┌───▼────────┐  ┌───▼─────────┐
+   │  Pattern 1:     │  │ Pattern 2: │  │  Pattern 3: │
+   │  Direct API     │  │  Web App   │  │  Worker     │
+   │  Integration    │  │ Integration│  │  Queue      │
+   └────────┬────────┘  └─────┬──────┘  └──────┬──────┘
+            │                 │                 │
+            │        ┌────────▼────────┐        │
+            │        │  Claude SDK     │        │
+            └───────▶│  Client Pool    │◄───────┘
+                     └────────┬────────┘
+                              │
+                  ┌───────────┼───────────┐
+                  │           │           │
+         ┌────────▼──────┐ ┌─▼────────┐ ┌▼────────────┐
+         │ Claude API    │ │ MCP      │ │ Monitoring  │
+         │ (Anthropic)   │ │ Servers  │ │ & Logging   │
+         └───────────────┘ └──────────┘ └─────────────┘
+```
+
 ### Pattern 1: Direct API Integration
 
 **Use Case**: Backend services, automation pipelines, scheduled tasks

@@ -54,6 +54,45 @@
 
 ## Installation
 
+```
+                    Quick Start Workflow
+
+    ┌───────────────────────────────────────────┐
+    │  1. Prerequisites                         │
+    │  ✓ Python 3.10+ or Node.js 18+          │
+    │  ✓ Anthropic API Key                     │
+    └──────────────┬────────────────────────────┘
+                   │
+                   ▼
+    ┌───────────────────────────────────────────┐
+    │  2. Install SDK                           │
+    │  pip install claude-agent-sdk (Python)    │
+    │  npm install claude-agent-sdk (TypeScript)│
+    └──────────────┬────────────────────────────┘
+                   │
+                   ▼
+    ┌───────────────────────────────────────────┐
+    │  3. Configure API Key                     │
+    │  export ANTHROPIC_API_KEY='sk-ant-...'   │
+    └──────────────┬────────────────────────────┘
+                   │
+                   ▼
+    ┌───────────────────────────────────────────┐
+    │  4. Hello World                           │
+    │  from claude_agent_sdk import query       │
+    │  async for msg in query("Hello!"):        │
+    │      print(msg)                           │
+    └──────────────┬────────────────────────────┘
+                   │
+                   ▼
+    ┌───────────────────────────────────────────┐
+    │  5. Production Ready                      │
+    │  ✓ Add tools & MCP servers               │
+    │  ✓ Configure hooks & security            │
+    │  ✓ Deploy & monitor                      │
+    └───────────────────────────────────────────┘
+```
+
 ### Python SDK
 
 **Standard Installation**:

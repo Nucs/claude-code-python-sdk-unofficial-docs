@@ -288,9 +288,20 @@ Built on **JSON-RPC**, MCP provides a stateful session protocol focused on conte
 **Client-Host-Server Architecture**:[^12]
 
 ```
-AI Application (Client) ←→ MCP Host ←→ MCP Server
+┌──────────────────┐         ┌──────────────┐         ┌─────────────────┐
+│   AI Application │ ◄────── │   MCP Host   │ ◄────── │   MCP Server    │
+│     (Client)     │   1:1   │ (SDK/Claude) │   1:N   │   (External)    │
+└──────────────────┘         └──────────────┘         └─────────────────┘
+         │                           │                          │
+         │                           │                          │
+    ┌────▼─────┐              ┌──────▼──────┐          ┌───────▼────────┐
+    │  Query   │              │ Orchestrate │          │  Slack Server  │
+    │ Response │              │   Route     │          │ GitHub Server  │
+    └──────────┘              │  Manage     │          │  DB Server     │
+                              └─────────────┘          └────────────────┘
 ```
 
+**Key Relationships**:
 - Each client has 1:1 relationship with MCP server
 - Multiple clients can connect to singular MCP host
 - Orchestration logic in integration layer (IDEs, Claude Desktop)
@@ -302,6 +313,27 @@ AI Application (Client) ←→ MCP Host ←→ MCP Server
 ### Subagent Design
 
 **Definition**: Specialized agents designed for one specific job, delegated from a main agent.[^13]
+
+```
+                    ┌─────────────────────────┐
+                    │   Main Orchestrator     │
+                    │    (Master Agent)       │
+                    └────────────┬────────────┘
+                                 │
+                  ┌──────────────┼──────────────┐
+                  │              │              │
+         ┌────────▼────────┐ ┌──▼──────┐ ┌────▼─────────┐
+         │  Security Agent │ │ Code    │ │ Test Writer  │
+         │  - Audit code   │ │ Generator│ │ - Unit tests │
+         │  - Find vulns   │ │ - Impl  │ │ - Integration│
+         └─────────────────┘ └─────────┘ └──────────────┘
+                  │              │              │
+                  └──────────────┼──────────────┘
+                                 │
+                    ┌────────────▼────────────┐
+                    │   Aggregated Results    │
+                    └─────────────────────────┘
+```
 
 **Key Benefits**:
 1. **Parallelization**: Spin up multiple subagents for concurrent tasks[^14]
@@ -370,6 +402,43 @@ async with asyncio.TaskGroup() as group:
 ### Hook Architecture
 
 **Definition**: Hooks are Python functions that the Claude Code application invokes at specific points of the Claude agent loop.[^16]
+
+```
+         User Input
+              │
+              ▼
+    ┌─────────────────┐
+    │ UserPromptSubmit│◄─── Hook: Filter/validate input
+    └────────┬────────┘
+             │
+             ▼
+    ┌─────────────────┐
+    │  Agent Planning │
+    └────────┬────────┘
+             │
+             ▼
+    ┌─────────────────┐
+    │   PreToolUse    │◄─── Hook: Block/allow/modify
+    └────────┬────────┘
+             │
+             ▼
+    ┌─────────────────┐
+    │  Tool Execution │
+    └────────┬────────┘
+             │
+             ▼
+    ┌─────────────────┐
+    │  PostToolUse    │◄─── Hook: Log/transform results
+    └────────┬────────┘
+             │
+             ▼
+    ┌─────────────────┐
+    │  PreCompact     │◄─── Hook: Preserve important msgs
+    └────────┬────────┘
+             │
+             ▼
+         Response
+```
 
 **Purpose**:
 - Deterministic processing

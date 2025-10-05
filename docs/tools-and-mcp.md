@@ -22,6 +22,43 @@
 
 The Claude Agent SDK provides six core built-in tools that enable file operations, code execution, and web access.[^1]
 
+```
+                       Tool Invocation Flow
+
+    User Query
+         │
+         ▼
+    ┌─────────────────┐
+    │ Claude Planning │
+    │  - Parse intent │
+    │  - Select tools │
+    └────────┬────────┘
+             │
+             ▼
+    ┌─────────────────┐        ┌──────────────────┐
+    │  Permission     │───No──▶│ Request User     │
+    │  Check          │        │ Approval         │
+    └────────┬────────┘        └──────────────────┘
+             │ Yes
+             ▼
+    ┌─────────────────┐
+    │  Tool Execution │
+    │  - Read/Write   │
+    │  - Bash/Grep    │
+    │  - WebFetch     │
+    │  - MCP Tools    │
+    └────────┬────────┘
+             │
+             ▼
+    ┌─────────────────┐
+    │  Result         │
+    │  Processing     │
+    └────────┬────────┘
+             │
+             ▼
+    Response to User
+```
+
 ### Read Tool
 
 Reads file contents from the filesystem.

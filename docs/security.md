@@ -90,6 +90,39 @@ api_key = "sk-ant-..."  # Never do this!
 
 **Description**: Malicious instructions hidden in input text can override Claude's intended behavior and lead to harmful actions, including exfiltrating sensitive data.[^2]
 
+```
+                      Attack Surface Diagram
+
+    ┌──────────────┐           ┌─────────────────────┐
+    │ Direct Input │─────1────▶│                     │
+    └──────────────┘           │   Claude Agent SDK  │
+                               │                     │
+    ┌──────────────┐           │  ┌───────────────┐  │
+    │ File Content │─────2────▶│  │ System Prompt │  │
+    └──────────────┘           │  └───────┬───────┘  │
+                               │          │          │
+    ┌──────────────┐           │  ┌───────▼───────┐  │
+    │ Web Fetched  │─────3────▶│  │ User Context  │  │
+    │   Content    │           │  └───────┬───────┘  │
+    └──────────────┘           │          │          │
+                               │  ┌───────▼───────┐  │
+    ┌──────────────┐           │  │ Tool Execution│  │
+    │ Tool Results │◀────4─────│  └───────────────┘  │
+    └──────────────┘           │                     │
+           │                   └─────────────────────┘
+           │
+           ▼
+    ┌──────────────┐
+    │ Exfiltration │
+    │   Risk Zone  │
+    └──────────────┘
+
+    1. Direct user input manipulation
+    2. Hidden instructions in processed files
+    3. External content with embedded commands
+    4. Tool results containing injected payloads
+```
+
 **Attack Vectors**:
 
 **Direct Injection**:
