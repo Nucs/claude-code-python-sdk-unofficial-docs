@@ -2,8 +2,8 @@
 
 > **Comprehensive guide to building AI agents with Claude Agent SDK**
 
-[![Deploy Documentation](https://github.com/yourusername/claude-agent-sdk-wiki/actions/workflows/docs.yml/badge.svg)](https://github.com/yourusername/claude-agent-sdk-wiki/actions/workflows/docs.yml)
-[![Documentation](https://img.shields.io/badge/docs-live-success)](https://yourusername.github.io/claude-agent-sdk-wiki/)
+[![Deploy Documentation](https://github.com/Nucs/claude-code-python-sdk-unofficial-docs/actions/workflows/docs.yml/badge.svg)](https://github.com/Nucs/claude-code-python-sdk-unofficial-docs/actions/workflows/docs.yml)
+[![Documentation](https://img.shields.io/badge/docs-live-success)](https://Nucs.github.io/claude-code-python-sdk-unofficial-docs/)
 [![MkDocs](https://img.shields.io/badge/built%20with-MkDocs%20Material-blue)](https://squidfunk.github.io/mkdocs-material/)
 
 ## 📚 About
@@ -21,14 +21,14 @@ This is a comprehensive, community-driven documentation for the Claude Agent SDK
 
 ### View Documentation Online
 
-Visit the live documentation: **[https://yourusername.github.io/claude-agent-sdk-wiki/](https://yourusername.github.io/claude-agent-sdk-wiki/)**
+Visit the live documentation: **[https://Nucs.github.io/claude-code-python-sdk-unofficial-docs/](https://Nucs.github.io/claude-code-python-sdk-unofficial-docs/)**
 
 ### Run Locally
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/claude-agent-sdk-wiki.git
-   cd claude-agent-sdk-wiki
+   git clone https://github.com/Nucs/claude-code-python-sdk-unofficial-docs.git
+   cd claude-code-python-sdk-unofficial-docs
    ```
 
 2. **Install dependencies**
@@ -80,7 +80,7 @@ docs/
    - Wait for deployment workflow to complete
 
 3. **Access your site**
-   - URL: `https://yourusername.github.io/claude-agent-sdk-wiki/`
+   - URL: `https://Nucs.github.io/claude-code-python-sdk-unofficial-docs/`
 
 ### Option 2: Manual Deployment
 
@@ -100,9 +100,9 @@ Edit `mkdocs.yml`:
 
 ```yaml
 # Update these values
-site_url: https://yourusername.github.io/claude-agent-sdk-wiki/
-repo_name: yourusername/claude-agent-sdk-wiki
-repo_url: https://github.com/yourusername/claude-agent-sdk-wiki
+site_url: https://Nucs.github.io/claude-code-python-sdk-unofficial-docs/
+repo_name: Nucs/claude-code-python-sdk-unofficial-docs
+repo_url: https://github.com/Nucs/claude-code-python-sdk-unofficial-docs
 ```
 
 ### Customize Theme
@@ -244,8 +244,8 @@ This documentation is community-maintained and follows the licensing of the Clau
 
 ## 📮 Support
 
-- **Issues**: [GitHub Issues](https://github.com/yourusername/claude-agent-sdk-wiki/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/yourusername/claude-agent-sdk-wiki/discussions)
+- **Issues**: [GitHub Issues](https://github.com/Nucs/claude-code-python-sdk-unofficial-docs/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/Nucs/claude-code-python-sdk-unofficial-docs/discussions)
 - **Discord**: [Anthropic Discord](https://discord.gg/anthropic)
 
 ---
