@@ -623,40 +623,40 @@
 
 ## Citation Index by File
 
-### index.md
+### [index.md](https://Nucs.github.io/claude-code-python-sdk-unofficial-docs/)
 Citations: [^1] through [^19]
 
-### overview.md
+### [overview.md](https://Nucs.github.io/claude-code-python-sdk-unofficial-docs/overview/)
 Citations: [^1] through [^31]
 
-### architecture.md
+### [architecture.md](https://Nucs.github.io/claude-code-python-sdk-unofficial-docs/architecture/)
 Citations: [^1] through [^29]
 
-### real-world-use-cases.md
+### [real-world-use-cases.md](https://Nucs.github.io/claude-code-python-sdk-unofficial-docs/real-world-use-cases/)
 Citations: [^1] through [^32] (ENHANCED with 6 enterprise cases + 5 GitHub open-source projects)
 
-### getting-started.md
+### [getting-started.md](https://Nucs.github.io/claude-code-python-sdk-unofficial-docs/getting-started/)
 Citations: [^1] through [^6] (ENHANCED with 3 new practical examples)
 
-### api-reference.md
+### [api-reference.md](https://Nucs.github.io/claude-code-python-sdk-unofficial-docs/api-reference/)
 Citations: [^1] through [^3]
 
-### security.md
+### [security.md](https://Nucs.github.io/claude-code-python-sdk-unofficial-docs/security/)
 Citations: [^1] through [^11]
 
-### tools-and-mcp.md
+### [tools-and-mcp.md](https://Nucs.github.io/claude-code-python-sdk-unofficial-docs/tools-and-mcp/)
 Citations: [^1] through [^7] (NEW FILE)
 
-### production-patterns.md
+### [production-patterns.md](https://Nucs.github.io/claude-code-python-sdk-unofficial-docs/production-patterns/)
 Citations: [^1] through [^9] (NEW FILE)
 
-### performance-optimization.md
+### [performance-optimization.md](https://Nucs.github.io/claude-code-python-sdk-unofficial-docs/performance-optimization/)
 Citations: [^1] through [^9] (NEW FILE)
 
-### troubleshooting.md
+### [troubleshooting.md](https://Nucs.github.io/claude-code-python-sdk-unofficial-docs/troubleshooting/)
 Citations: [^1] through [^5] (NEW FILE)
 
-### community-resources.md
+### [community-resources.md](https://Nucs.github.io/claude-code-python-sdk-unofficial-docs/community-resources/)
 Citations: [^1] through [^5] (NEW FILE)
 
 ---
@@ -667,19 +667,19 @@ Citations: [^1] through [^5] (NEW FILE)
 
 **Session 1 Enhancements**:
 
-**real-world-use-cases.md** (Initial):
+**[real-world-use-cases.md](https://Nucs.github.io/claude-code-python-sdk-unofficial-docs/real-world-use-cases/)** (Initial):
 - Added 6 new enterprise case studies (TELUS, Rakuten, Zapier, IG Group, Enterprise Pilots)
 - Included verified metrics: 79% faster delivery, 99.9% accuracy, 70 hours weekly savings
 - Added 3-month ROI data, 30% PR improvement metrics
 - Total case studies increased from 18 → 23
 
-**getting-started.md** (Initial):
+**[getting-started.md](https://Nucs.github.io/claude-code-python-sdk-unofficial-docs/getting-started/)** (Initial):
 - Added 3 new practical code examples (Email Agent, Shopify Support, Document Generation)
 - Provided complete, runnable implementations
 - Based on real Anthropic examples and patterns
 - Now includes 10 examples (was 7)
 
-**references.md** (Initial):
+**[references.md](https://Nucs.github.io/claude-code-python-sdk-unofficial-docs/references/)** (Initial):
 - Added 10 new verified sources (3 enterprise, 5 MCP, 2 production)
 - Total sources increased from 111 → 121
 - Enhanced categorization with NEW sections
@@ -689,7 +689,7 @@ Citations: [^1] through [^5] (NEW FILE)
 
 **Session 2 Enhancements - GitHub Open-Source Projects**:
 
-**real-world-use-cases.md** (GitHub Update):
+**[real-world-use-cases.md](https://Nucs.github.io/claude-code-python-sdk-unofficial-docs/real-world-use-cases/)** (GitHub Update):
 - Added new "Open-Source Community Projects" section
 - Documented 5 major GitHub repositories with implementation details:
   - Claude Flow: 84.8% SWE-Bench, 2.8-4.4x speed, 64-agent swarm system
@@ -701,7 +701,7 @@ Citations: [^1] through [^5] (NEW FILE)
 - Updated performance metrics tables with Claude Flow benchmarks
 - Total case studies increased from 23 → 28
 
-**references.md** (GitHub Update):
+**[references.md](https://Nucs.github.io/claude-code-python-sdk-unofficial-docs/references/)** (GitHub Update):
 - Added 6 new GitHub open-source project sources (122-127)
 - New category: "GitHub Open-Source Projects"
 - Total sources increased from 121 → 127
