@@ -633,10 +633,10 @@ Citations: [^1] through [^31]
 Citations: [^1] through [^29]
 
 ### [real-world-use-cases.md](https://Nucs.github.io/claude-code-python-sdk-unofficial-docs/real-world-use-cases/)
-Citations: [^1] through [^32] (ENHANCED with 6 enterprise cases + 5 GitHub open-source projects)
+Citations: [^1] through [^32]
 
 ### [getting-started.md](https://Nucs.github.io/claude-code-python-sdk-unofficial-docs/getting-started/)
-Citations: [^1] through [^6] (ENHANCED with 3 new practical examples)
+Citations: [^1] through [^6]
 
 ### [api-reference.md](https://Nucs.github.io/claude-code-python-sdk-unofficial-docs/api-reference/)
 Citations: [^1] through [^3]
@@ -645,67 +645,19 @@ Citations: [^1] through [^3]
 Citations: [^1] through [^11]
 
 ### [tools-and-mcp.md](https://Nucs.github.io/claude-code-python-sdk-unofficial-docs/tools-and-mcp/)
-Citations: [^1] through [^7] (NEW FILE)
+Citations: [^1] through [^7]
 
 ### [production-patterns.md](https://Nucs.github.io/claude-code-python-sdk-unofficial-docs/production-patterns/)
-Citations: [^1] through [^9] (NEW FILE)
+Citations: [^1] through [^9]
 
 ### [performance-optimization.md](https://Nucs.github.io/claude-code-python-sdk-unofficial-docs/performance-optimization/)
-Citations: [^1] through [^9] (NEW FILE)
+Citations: [^1] through [^9]
 
 ### [troubleshooting.md](https://Nucs.github.io/claude-code-python-sdk-unofficial-docs/troubleshooting/)
-Citations: [^1] through [^5] (NEW FILE)
+Citations: [^1] through [^5]
 
 ### [community-resources.md](https://Nucs.github.io/claude-code-python-sdk-unofficial-docs/community-resources/)
-Citations: [^1] through [^5] (NEW FILE)
-
----
-
-## Improvements Summary
-
-### ✅ Enhanced Files (2025 Update)
-
-**Session 1 Enhancements**:
-
-**[real-world-use-cases.md](https://Nucs.github.io/claude-code-python-sdk-unofficial-docs/real-world-use-cases/)** (Initial):
-- Added 6 new enterprise case studies (TELUS, Rakuten, Zapier, IG Group, Enterprise Pilots)
-- Included verified metrics: 79% faster delivery, 99.9% accuracy, 70 hours weekly savings
-- Added 3-month ROI data, 30% PR improvement metrics
-- Total case studies increased from 18 → 23
-
-**[getting-started.md](https://Nucs.github.io/claude-code-python-sdk-unofficial-docs/getting-started/)** (Initial):
-- Added 3 new practical code examples (Email Agent, Shopify Support, Document Generation)
-- Provided complete, runnable implementations
-- Based on real Anthropic examples and patterns
-- Now includes 10 examples (was 7)
-
-**[references.md](https://Nucs.github.io/claude-code-python-sdk-unofficial-docs/references/)** (Initial):
-- Added 10 new verified sources (3 enterprise, 5 MCP, 2 production)
-- Total sources increased from 111 → 121
-- Enhanced categorization with NEW sections
-- Updated total source count and citation index
-
----
-
-**Session 2 Enhancements - GitHub Open-Source Projects**:
-
-**[real-world-use-cases.md](https://Nucs.github.io/claude-code-python-sdk-unofficial-docs/real-world-use-cases/)** (GitHub Update):
-- Added new "Open-Source Community Projects" section
-- Documented 5 major GitHub repositories with implementation details:
-  - Claude Flow: 84.8% SWE-Bench, 2.8-4.4x speed, 64-agent swarm system
-  - Anthropic Email Agent Demo: Official IMAP demo with WebSocket streaming
-  - VoltAgent Subagents: 100+ production agents, 1.6k stars, enterprise patterns
-  - wshobson Production Framework: 8-12 capabilities/agent, best practices
-  - DataCamp Learning Projects: Educational examples with hooks and safety
-- Added code examples for email agent, subagent architecture, coordination patterns
-- Updated performance metrics tables with Claude Flow benchmarks
-- Total case studies increased from 23 → 28
-
-**[references.md](https://Nucs.github.io/claude-code-python-sdk-unofficial-docs/references/)** (GitHub Update):
-- Added 6 new GitHub open-source project sources (122-127)
-- New category: "GitHub Open-Source Projects"
-- Total sources increased from 121 → 127
-- Enhanced citation tracking: real-world-use-cases.md now [^1] through [^32]
+Citations: [^1] through [^5]
 
 ---
 

@@ -843,7 +843,7 @@ except ContextLengthExceededError:
 
 ### Debug Checklist
 
-When encountering issues, check:
+When encountering issues, verify:
 
 1. **✅ API Key**: `echo $ANTHROPIC_API_KEY` shows valid key
 2. **✅ Installation**: `pip list | grep claude-agent-sdk` shows package

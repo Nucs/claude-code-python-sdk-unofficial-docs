@@ -54,6 +54,8 @@ async def query(
 - ✅ Independent tasks without context requirements
 - ✅ Simple automation scripts
 - ✅ CI/CD pipelines
+
+**Not Recommended For**:
 - ❌ Multi-turn conversations (use `ClaudeSDKClient`)
 - ❌ Interactive applications (use `ClaudeSDKClient`)
 
@@ -282,12 +284,12 @@ options = ClaudeAgentOptions(
 **Maintains a conversation session across multiple exchanges.** This is the Python equivalent of how the TypeScript SDK's `query()` function works internally.
 
 **Key Features**:
-- ✅ Session Continuity: Maintains conversation context
-- ✅ Same Conversation: Claude remembers previous messages
-- ✅ Interrupt Support: Can stop Claude mid-execution
-- ✅ Explicit Lifecycle: You control when session starts/ends
-- ✅ Response-driven Flow: React to responses and send follow-ups
-- ✅ Custom Tools & Hooks: Supports custom tools and hooks
+- ✅ **Session Continuity**: Maintains conversation context
+- ✅ **Same Conversation**: Claude remembers previous messages
+- ✅ **Interrupt Support**: Can stop Claude mid-execution
+- ✅ **Explicit Lifecycle**: Control when session starts/ends
+- ✅ **Response-driven Flow**: React to responses and send follow-ups
+- ✅ **Custom Tools & Hooks**: Supports custom tools and hooks
 
 **Signature**:
 ```python
@@ -321,7 +323,7 @@ async with ClaudeSDKClient() as client:
         print(message)
 ```
 
-> **Important**: When iterating over messages, avoid using `break` to exit early as this can cause asyncio cleanup issues. Instead, let the iteration complete naturally or use flags to track when you've found what you need.
+> **Important**: Using `break` to exit early during message iteration may cause asyncio cleanup issues. Allow the iteration to complete naturally or use flags to track completion state.
 
 **Multi-Turn Conversation Example**:
 ```python
@@ -849,7 +851,7 @@ HookEvent = Literal[
 > - `SessionEnd` - Session cleanup hook
 > - `Notification` - Real-time notification hook
 >
-> This is a fundamental limitation of the Python SDK's design and will not be added in future versions. Use the TypeScript SDK if these hooks are required.
+> This is a fundamental limitation of the Python SDK's design. Use the TypeScript SDK if these hooks are required.
 
 ### `HookCallback`
 
@@ -877,7 +879,7 @@ HookCallback = Callable[
 ```python
 @dataclass
 class HookContext:
-    signal: Any | None = None  # Future: abort signal support
+    signal: Any | None = None  # Reserved for abort signal support
 ```
 
 ### `HookMatcher`
