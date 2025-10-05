@@ -1078,6 +1078,336 @@ anyio.run(settings_example)
 - **Current behavior**: When `setting_sources` is omitted or `None`, no filesystem settings are loaded
 - **Migration**: Add `setting_sources=["project"]` to maintain previous behavior
 
+### Example 12a: Session Management and Resumption
+
+**Source**: Real-world session management patterns
+
+**Purpose**: Resume, fork, and continue conversations across multiple executions
+
+```python
+import anyio
+from claude_agent_sdk import query, ClaudeSDKClient, ClaudeAgentOptions
+import json
+import os
+
+class SessionManager:
+    """Manage conversation sessions with persistence."""
+
+    def __init__(self, session_file="sessions.json"):
+        self.session_file = session_file
+        self.sessions = self._load_sessions()
+
+    def _load_sessions(self):
+        """Load sessions from file."""
+        if os.path.exists(self.session_file):
+            with open(self.session_file, 'r') as f:
+                return json.load(f)
+        return {}
+
+    def _save_sessions(self):
+        """Save sessions to file."""
+        with open(self.session_file, 'w') as f:
+            json.dump(self.sessions, f, indent=2)
+
+    def save_session(self, name: str, session_id: str):
+        """Save a session ID with a friendly name."""
+        self.sessions[name] = session_id
+        self._save_sessions()
+        print(f"Session '{name}' saved: {session_id}")
+
+    def get_session(self, name: str) -> str | None:
+        """Retrieve a session ID by name."""
+        return self.sessions.get(name)
+
+
+async def example_continue_conversation():
+    """Continue the most recent conversation."""
+    print("=== Continue Conversation Example ===\n")
+
+    # First interaction
+    print("First interaction:")
+    options1 = ClaudeAgentOptions(
+        allowed_tools=["Read"]
+    )
+
+    async for msg in query(prompt="What's the capital of France?", options=options1):
+        print(msg)
+
+    # Continue the conversation
+    print("\nContinuing conversation:")
+    options2 = ClaudeAgentOptions(
+        continue_conversation=True,  # Continue from previous
+        allowed_tools=["Read"]
+    )
+
+    async for msg in query(
+        prompt="What's the population of that city?",  # Claude remembers "France"
+        options=options2
+    ):
+        print(msg)
+
+
+async def example_resume_session():
+    """Resume a specific session by ID."""
+    print("=== Resume Session Example ===\n")
+
+    session_manager = SessionManager()
+
+    # First session
+    print("Creating initial session:")
+    async with ClaudeSDKClient() as client:
+        await client.query("Tell me about Python async programming")
+
+        # Get session ID (from context or logging)
+        # Note: In practice, you'd extract this from client internals or logs
+        session_id = "session_abc123"  # Example session ID
+
+        # Save for later
+        session_manager.save_session("python_discussion", session_id)
+
+        async for msg in client.receive_response():
+            print(msg)
+
+    # Later: Resume the same session
+    print("\nResuming session:")
+    resume_options = ClaudeAgentOptions(
+        resume=session_manager.get_session("python_discussion")
+    )
+
+    async with ClaudeSDKClient(options=resume_options) as client:
+        # Continue where you left off
+        await client.query("Can you explain asyncio event loops in detail?")
+
+        async for msg in client.receive_response():
+            print(msg)
+
+
+async def example_fork_session():
+    """Fork a session to explore alternative paths."""
+    print("=== Fork Session Example ===\n")
+
+    session_manager = SessionManager()
+
+    # Original session
+    print("Original session - discussing architecture:")
+    async with ClaudeSDKClient() as client:
+        await client.query("Help me design a microservices architecture")
+
+        session_id = "architecture_session_123"
+        session_manager.save_session("architecture_main", session_id)
+
+        async for msg in client.receive_response():
+            print(msg)
+
+    # Fork 1: Explore security aspects
+    print("\nFork 1 - Security focus:")
+    fork1_options = ClaudeAgentOptions(
+        resume=session_manager.get_session("architecture_main"),
+        fork_session=True  # Create new session branching from original
+    )
+
+    async with ClaudeSDKClient(options=fork1_options) as client:
+        await client.query("What are the security considerations for this architecture?")
+
+        async for msg in client.receive_response():
+            print(msg)
+
+    # Fork 2: Explore scalability
+    print("\nFork 2 - Scalability focus:")
+    fork2_options = ClaudeAgentOptions(
+        resume=session_manager.get_session("architecture_main"),
+        fork_session=True  # Another fork from same original
+    )
+
+    async with ClaudeSDKClient(options=fork2_options) as client:
+        await client.query("How can I scale this architecture to handle 1M users?")
+
+        async for msg in client.receive_response():
+            print(msg)
+
+
+async def example_multi_session_workflow():
+    """Production workflow with session management."""
+    print("=== Multi-Session Production Workflow ===\n")
+
+    class ProductionSessionManager(SessionManager):
+        """Enhanced session manager with metadata."""
+
+        def save_session_with_metadata(self, name: str, session_id: str, metadata: dict):
+            """Save session with additional context."""
+            self.sessions[name] = {
+                "session_id": session_id,
+                "metadata": metadata,
+                "created_at": datetime.now().isoformat()
+            }
+            self._save_sessions()
+
+        def get_session_id(self, name: str) -> str | None:
+            """Get just the session ID."""
+            session_data = self.sessions.get(name)
+            if isinstance(session_data, dict):
+                return session_data.get("session_id")
+            return session_data
+
+    manager = ProductionSessionManager("production_sessions.json")
+
+    # Start analysis session
+    options = ClaudeAgentOptions(
+        allowed_tools=["Read", "Grep"],
+        permission_mode="acceptEdits"
+    )
+
+    async with ClaudeSDKClient(options=options) as client:
+        await client.query("Analyze the codebase for security issues")
+
+        # Save session with metadata
+        manager.save_session_with_metadata(
+            "security_audit_2025_01_15",
+            "session_xyz789",
+            {
+                "type": "security_audit",
+                "project": "main_app",
+                "analyst": "user@example.com"
+            }
+        )
+
+        async for msg in client.receive_response():
+            print(msg)
+
+    # Resume for follow-up analysis
+    resume_options = ClaudeAgentOptions(
+        resume=manager.get_session_id("security_audit_2025_01_15"),
+        allowed_tools=["Read", "Grep"],
+        permission_mode="acceptEdits"
+    )
+
+    async with ClaudeSDKClient(options=resume_options) as client:
+        await client.query("Generate a detailed report of the findings")
+
+        async for msg in client.receive_response():
+            print(msg)
+
+
+async def main():
+    """Run all session management examples."""
+    await example_continue_conversation()
+    print("\n" + "=" * 50 + "\n")
+
+    await example_resume_session()
+    print("\n" + "=" * 50 + "\n")
+
+    await example_fork_session()
+    print("\n" + "=" * 50 + "\n")
+
+    await example_multi_session_workflow()
+
+
+anyio.run(main)
+```
+
+**Session Management Comparison**:
+
+| Feature | Use Case | Example |
+|---------|----------|---------|
+| **continue_conversation** | Continue most recent conversation | `ClaudeAgentOptions(continue_conversation=True)` |
+| **resume** | Resume specific session by ID | `ClaudeAgentOptions(resume="session_abc123")` |
+| **fork_session** | Branch from existing session | `ClaudeAgentOptions(resume="session_123", fork_session=True)` |
+
+**Use Cases**:
+
+1. **Continue Conversation**: Simple multi-turn interactions in same process
+   - Follow-up questions
+   - Iterative refinement
+   - Context-dependent queries
+
+2. **Resume Session**: Cross-execution session persistence
+   - Long-running tasks
+   - Multi-day projects
+   - Distributed workflows
+
+3. **Fork Session**: Explore alternative paths without affecting original
+   - A/B testing different approaches
+   - Parallel investigation of options
+   - What-if scenario analysis
+
+**Production Patterns**:
+
+```python
+# Pattern 1: Session persistence across restarts
+class PersistentSession:
+    """Maintain session across application restarts."""
+
+    def __init__(self, session_key: str):
+        self.session_key = session_key
+        self.session_file = f".sessions/{session_key}.json"
+
+    def load_or_create(self) -> ClaudeAgentOptions:
+        """Load existing session or create new."""
+        if os.path.exists(self.session_file):
+            with open(self.session_file, 'r') as f:
+                data = json.load(f)
+                return ClaudeAgentOptions(resume=data['session_id'])
+
+        return ClaudeAgentOptions()  # New session
+
+    def save(self, session_id: str):
+        """Save session ID for resumption."""
+        os.makedirs(".sessions", exist_ok=True)
+        with open(self.session_file, 'w') as f:
+            json.dump({'session_id': session_id}, f)
+
+
+# Pattern 2: Session branching for parallel exploration
+async def explore_alternatives(base_session_id: str, questions: list[str]):
+    """Fork session multiple times to explore alternatives."""
+    results = []
+
+    for i, question in enumerate(questions):
+        fork_options = ClaudeAgentOptions(
+            resume=base_session_id,
+            fork_session=True
+        )
+
+        async with ClaudeSDKClient(options=fork_options) as client:
+            await client.query(question)
+
+            response = []
+            async for msg in client.receive_response():
+                response.append(msg)
+
+            results.append({
+                "question": question,
+                "fork": i,
+                "response": response
+            })
+
+    return results
+
+
+# Pattern 3: Session cleanup and archival
+class SessionArchive:
+    """Archive old sessions for compliance."""
+
+    def archive_session(self, session_id: str, metadata: dict):
+        """Archive session with metadata."""
+        archive_path = f"archive/{datetime.now().strftime('%Y%m')}/{session_id}.json"
+        os.makedirs(os.path.dirname(archive_path), exist_ok=True)
+
+        with open(archive_path, 'w') as f:
+            json.dump({
+                "session_id": session_id,
+                "metadata": metadata,
+                "archived_at": datetime.now().isoformat()
+            }, f, indent=2)
+```
+
+**Important Notes**:
+- Session IDs are managed internally by Claude Code CLI
+- `continue_conversation` works for same-process continuity
+- `resume` requires saving session IDs from previous executions
+- `fork_session=True` creates a new session branching from the specified one
+- Sessions persist based on Claude Code CLI configuration
+
 ### Example 13: Tool Permission Callback
 
 **Source**: `examples/tool_permission_callback.py` from official repository

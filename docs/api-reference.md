@@ -487,6 +487,76 @@ class ClaudeAgentOptions:
 | `api_key` | `str \| None` | `None` | Anthropic API key (overrides ANTHROPIC_API_KEY env var) |
 | `max_tokens` | `int \| None` | `None` | Maximum tokens for completion (controls response length and cost) |
 | `cwd` | `str \| Path \| None` | `None` | Working directory for operations |
+| `env` | `dict[str, str]` | `{}` | Environment variables for CLI process |
+| `continue_conversation` | `bool` | `False` | Continue from most recent conversation |
+| `resume` | `str \| None` | `None` | Resume specific session by ID |
+| `fork_session` | `bool` | `False` | Create new session branching from resumed session |
+| `max_turns` | `int \| None` | `None` | Maximum conversation turns before stopping |
+| `stderr` | `Callable[[str], None] \| None` | `None` | Callback for CLI stderr output |
+| `extra_args` | `dict[str, str \| None]` | `{}` | Additional CLI arguments (advanced) |
+
+**Session Management Examples**:
+
+```python
+# Continue most recent conversation
+options = ClaudeAgentOptions(
+    continue_conversation=True
+)
+
+# Resume specific session by ID
+options = ClaudeAgentOptions(
+    resume="session_abc123"
+)
+
+# Fork session for parallel exploration
+options = ClaudeAgentOptions(
+    resume="session_abc123",
+    fork_session=True  # Creates new branch
+)
+
+# Limit conversation length
+options = ClaudeAgentOptions(
+    max_turns=10  # Stop after 10 turns
+)
+```
+
+**CLI Integration Examples**:
+
+```python
+# Custom environment variables
+options = ClaudeAgentOptions(
+    env={
+        "MAX_THINKING_TOKENS": "8000",
+        "CUSTOM_VAR": "value"
+    }
+)
+
+# Stderr callback for debugging
+def stderr_handler(line: str):
+    if "ERROR" in line:
+        logger.error(f"CLI error: {line}")
+
+options = ClaudeAgentOptions(
+    stderr=stderr_handler
+)
+
+# Extra CLI arguments (advanced)
+options = ClaudeAgentOptions(
+    extra_args={
+        "debug-to-stderr": None,  # Boolean flag (None = present)
+        "custom-flag": "value"     # Flag with value
+    }
+)
+```
+
+**extra_args Use Cases**:
+
+| Argument | Value | Purpose |
+|----------|-------|---------|
+| `"debug-to-stderr"` | `None` | Enable debug output to stderr |
+| `"no-color"` | `None` | Disable ANSI color codes |
+| `"log-level"` | `"debug"` | Set CLI log level |
+| `"timeout"` | `"300"` | Set operation timeout (seconds) |
 
 **SuperClaude Framework Configuration Examples**:
 
