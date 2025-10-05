@@ -2,7 +2,7 @@
 
 > **Ecosystem projects, community tools, tutorials, and learning resources**
 
-[← Back to Index](index.md)
+[← Back to Documentation Index](index.md)
 
 ---
 
@@ -501,4 +501,4 @@
 
 [**→ Complete Bibliography**](references.md)
 
-[← Back to Index](index.md)
+[← Back to Documentation Index](index.md)

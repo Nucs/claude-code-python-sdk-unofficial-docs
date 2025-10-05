@@ -2,7 +2,7 @@
 
 > **Complete API documentation for all functions, classes, and types with SuperClaude framework integration**
 
-[← Back to Index](index.md) | [SuperClaude Integration Guide](../SDK_Python.md)
+[← Back to Documentation Index](index.md) | [Python SDK Guide](../SDK_Python.md)
 
 ---
 
@@ -354,7 +354,7 @@ asyncio.run(continuous_conversation())
 from claude_agent_sdk import ClaudeSDKClient, ClaudeAgentOptions
 
 async def task_management_session():
-    """Multi-session task workflow (see MODE_Task_Management.md)"""
+    """Multi-session task workflow (see Task Management Mode)"""
 
     options = ClaudeAgentOptions(
         mcp_servers={"serena": {...}},  # For memory persistence
@@ -495,10 +495,10 @@ options = ClaudeAgentOptions(
 # MCP Server Ecosystem (from SuperClaude wiki)
 options = ClaudeAgentOptions(
     mcp_servers={
-        "sequential": {...},  # MCP_Sequential.md
-        "context7": {...},    # MCP_Context7.md
-        "magic": {...},       # MCP_Magic.md
-        "playwright": {...}   # MCP_Playwright.md
+        "sequential": {...},  # Sequential Thinking MCP
+        "context7": {...},    # Context7 Documentation MCP
+        "magic": {...},       # Magic UI MCP
+        "playwright": {...}   # Playwright Browser MCP
     },
     allowed_tools=[
         "mcp__sequential__sequentialthinking",
@@ -513,15 +513,15 @@ async def safety_handler(tool_name: str, input_data: dict, context: dict):
     if tool_name == "Bash" and "rm -rf" in input_data.get("command", ""):
         return {
             "behavior": "deny",
-            "message": "Dangerous command blocked (RULES.md)"
+            "message": "Dangerous command blocked (Framework Rules)"
         }
     return {"behavior": "allow", "updatedInput": input_data}
 
 options = ClaudeAgentOptions(can_use_tool=safety_handler)
 
-# CLAUDE.md Project Instructions
+# Claude Configuration Project Instructions
 options = ClaudeAgentOptions(
-    setting_sources=["project"],  # Loads .claude/settings.json and CLAUDE.md
+    setting_sources=["project"],  # Loads .claude/settings.json and Claude Configuration
     system_prompt={"type": "preset", "preset": "claude_code"}
 )
 ```
@@ -589,7 +589,7 @@ SettingSource = Literal["user", "project", "local"]
 - **Current behavior** (v2.0+): When `setting_sources` is **omitted** or **`None`**, the SDK does **NOT** load any filesystem settings
 - **Impact**: Existing code relying on automatic settings loading will need to explicitly set `setting_sources`
 
-**Important**: Must include `"project"` to load CLAUDE.md files. If your code previously relied on automatic CLAUDE.md loading, you must now add `setting_sources=["project"]`.
+**Important**: Must include `"project"` to load [Claude Configuration](../CLAUDE.md) files. If your code previously relied on automatic configuration loading, you must now add `setting_sources=["project"]`.
 
 **Examples**:
 ```python
@@ -603,9 +603,9 @@ options = ClaudeAgentOptions(
     setting_sources=["project"]  # Only .claude/settings.json
 )
 
-# Load CLAUDE.md instructions
+# Load Claude Configuration instructions
 options = ClaudeAgentOptions(
-    setting_sources=["project"],  # Required for CLAUDE.md
+    setting_sources=["project"],  # Required for Claude Configuration
     system_prompt={"type": "preset", "preset": "claude_code"}
 )
 
@@ -652,7 +652,7 @@ options = ClaudeAgentOptions(
     agents={
         "security-analyst": AgentDefinition(
             description="Security vulnerability analysis",
-            prompt="Expert security engineer. See PRINCIPLES.md for standards.",
+            prompt="Expert security engineer. See Engineering Principles for standards.",
             tools=["Read", "Grep", "Glob"],
             model="sonnet"
         ),
@@ -904,7 +904,7 @@ async def enforce_safety(input_data, tool_use_id, context):
                 'hookSpecificOutput': {
                     'hookEventName': 'PreToolUse',
                     'permissionDecision': 'deny',
-                    'permissionDecisionReason': 'Never force push to main (RULES.md)'
+                    'permissionDecisionReason': 'Never force push to main (Framework Rules)'
                 }
             }
     return {}
@@ -1145,11 +1145,11 @@ Documentation of input/output schemas for all built-in Claude Code tools.
 ## See Also
 
 **SuperClaude Framework**:
-- [SDK_Python.md](../SDK_Python.md) - Complete SuperClaude integration guide
-- [CLAUDE.md](../CLAUDE.md) - Architecture overview
-- [MODE_Task_Management.md](../MODE_Task_Management.md) - Task patterns
-- [MCP_Sequential.md](../MCP_Sequential.md) - Complex reasoning
-- [RULES.md](../RULES.md) - Safety and compliance
+- [Python SDK Guide](../SDK_Python.md) - Complete SuperClaude integration guide
+- [Claude Configuration](../CLAUDE.md) - Architecture overview
+- [Task Management Mode](../MODE_Task_Management.md) - Task patterns
+- [Sequential Thinking MCP](../MCP_Sequential.md) - Complex reasoning
+- [Framework Rules](../RULES.md) - Safety and compliance
 
 **Official Documentation**:
 - [Python SDK Guide](https://docs.claude.com/en/api/agent-sdk/python)
@@ -1159,4 +1159,4 @@ Documentation of input/output schemas for all built-in Claude Code tools.
 
 ---
 
-[← Back to Index](index.md) | [Getting Started →](getting-started.md)
+[← Back to Documentation Index](index.md) | [Getting Started Guide →](getting-started.md)

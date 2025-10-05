@@ -2,7 +2,7 @@
 
 > **Comprehensive citation index for all Claude Agent SDK documentation**
 
-[← Back to Index](index.md)
+[← Back to Documentation Index](index.md)
 
 ---
 
@@ -709,4 +709,4 @@ Citations: [^1] through [^5] (NEW FILE)
 
 ---
 
-[← Back to Index](index.md)
+[← Back to Documentation Index](index.md)

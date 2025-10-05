@@ -2,7 +2,7 @@
 
 > **Enterprise deployment strategies, scaling patterns, production best practices, and SuperClaude framework integration**
 
-[← Back to Index](index.md)
+[← Back to Documentation Index](index.md)
 
 ---
 
@@ -257,7 +257,7 @@ class AgentOrchestrator:
 
 ## SuperClaude Framework Production Integration
 
-Production patterns for SuperClaude framework deployment with enterprise-grade reliability. **See**: [CLAUDE.md](../../../CLAUDE.md)
+Production patterns for SuperClaude framework deployment with enterprise-grade reliability. **See**: [Claude Configuration](../../../CLAUDE.md)
 
 ### Framework-Aware Production Service
 
@@ -317,7 +317,7 @@ class SuperClaudeProductionService:
             # Automated execution
             permission_mode='acceptAll',
 
-            # RULES.md enforcement via hooks
+            # Framework Rules enforcement via hooks
             hooks={
                 'PreToolUse': [
                     HookMatcher(matcher='Bash', hooks=[self._enforce_safety_rules])
@@ -333,19 +333,19 @@ class SuperClaudeProductionService:
         )
 
     async def _enforce_safety_rules(self, input_data, tool_use_id, context):
-        """Implement RULES.md safety enforcement"""
-        # See RULES.md for production safety standards
+        """Implement Framework Rules safety enforcement"""
+        # See Framework Rules for production safety standards
         tool_name = input_data.get('tool_name')
 
         if tool_name == 'Bash':
             cmd = input_data.get('tool_input', {}).get('command', '')
 
-            # RULES.md: Never force push to production branches
+            # Framework Rules: Never force push to production branches
             if 'push --force' in cmd and any(branch in cmd for branch in ['main', 'master', 'production']):
                 return {
                     'hookSpecificOutput': {
                         'permissionDecision': 'deny',
-                        'permissionDecisionReason': 'Force push to protected branches blocked (RULES.md)'
+                        'permissionDecisionReason': 'Force push to protected branches blocked (Framework Rules)'
                     }
                 }
 
@@ -392,11 +392,11 @@ if __name__ == "__main__":
 ```
 
 **Framework Benefits in Production**:
-- **Orchestration Mode**: Automatic tool selection optimization [@MODE_Orchestration.md](../../../MODE_Orchestration.md)
-- **Sequential MCP**: Deep analysis for complex production issues [@MCP_Sequential.md](../../../MCP_Sequential.md)
-- **Serena MCP**: Cross-session context preservation [@MCP_Serena.md](../../../MCP_Serena.md)
-- **RULES.md Enforcement**: Production safety standards [RULES.md](../../../RULES.md)
-- **Token Efficiency**: Optimized production costs [@MODE_Token_Efficiency.md](../../../MODE_Token_Efficiency.md)
+- **Orchestration Mode**: Automatic tool selection optimization [Orchestration Mode](../../../MODE_Orchestration.md)
+- **Sequential MCP**: Deep analysis for complex production issues [Sequential Thinking MCP](../../../MCP_Sequential.md)
+- **Serena MCP**: Cross-session context preservation [Serena Memory MCP](../../../MCP_Serena.md)
+- **RULES.md Enforcement**: Production safety standards [Framework Rules](../../../RULES.md)
+- **Token Efficiency**: Optimized production costs [Token Efficiency Mode](../../../MODE_Token_Efficiency.md)
 
 ### Cross-Session Production Continuity
 
@@ -485,7 +485,7 @@ asyncio.run(service.start_session())
 - **Incident Response**: Historical context for debugging
 - **Team Handoffs**: Complete context transfer between shifts
 
-**See**: [@MCP_Serena.md](../../../MCP_Serena.md), [@MODE_Task_Management.md](../../../MODE_Task_Management.md)
+**See**: [Serena Memory MCP](../../../MCP_Serena.md), [Task Management Mode](../../../MODE_Task_Management.md)
 
 ### CI/CD with Framework Integration
 
@@ -1510,4 +1510,4 @@ async def rate_limited_query(query: str):
 
 [**→ Complete Bibliography**](references.md)
 
-[← Back to Index](index.md)
+[← Back to Documentation Index](index.md)

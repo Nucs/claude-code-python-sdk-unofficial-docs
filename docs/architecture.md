@@ -2,7 +2,7 @@
 
 > **Internal design, implementation details, and technical architecture**
 
-[← Back to Index](index.md)
+[← Back to Documentation Index](index.md)
 
 ---
 
@@ -607,4 +607,4 @@ The SDK handles token management with:
 
 [**→ Complete Bibliography**](references.md)
 
-[← Back to Index](index.md)
+[← Back to Documentation Index](index.md)

@@ -2,7 +2,7 @@
 
 > **Common issues, debugging techniques, and solutions for Claude Agent SDK**
 
-[← Back to Index](index.md)
+[← Back to Documentation Index](index.md)
 
 ---
 
@@ -907,4 +907,4 @@ When encountering issues, check:
 
 [**→ Complete Bibliography**](references.md)
 
-[← Back to Index](index.md)
+[← Back to Documentation Index](index.md)

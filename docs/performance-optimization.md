@@ -2,7 +2,7 @@
 
 > **Benchmarks, cost analysis, and optimization techniques for production performance**
 
-[← Back to Index](index.md)
+[← Back to Documentation Index](index.md)
 
 ---
 
@@ -772,4 +772,4 @@ cache.invalidate_on_file_change("auth.py")
 
 [**→ Complete Bibliography**](references.md)
 
-[← Back to Index](index.md)
+[← Back to Documentation Index](index.md)

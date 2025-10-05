@@ -2,7 +2,7 @@
 
 > **Comprehensive guide to built-in tools, custom tool development, MCP ecosystem, and SuperClaude framework integration**
 
-[← Back to Index](index.md)
+[← Back to Documentation Index](index.md)
 
 ---
 
@@ -388,7 +388,7 @@ options = ClaudeAgentOptions(
 
 ## SuperClaude Framework MCP Servers
 
-The SuperClaude framework provides specialized MCP servers for advanced capabilities. **See**: [CLAUDE.md](../../../CLAUDE.md)
+The SuperClaude framework provides specialized MCP servers for advanced capabilities. **See**: [Claude Configuration](../../../CLAUDE.md)
 
 ### Sequential MCP (Structured Reasoning)
 
@@ -441,7 +441,7 @@ async with ClaudeSDKClient(options=options) as client:
 - Root cause analysis with hypothesis testing
 - Multi-component failure investigation
 
-**See**: [@MCP_Sequential.md](../../../MCP_Sequential.md)
+**See**: [Sequential Thinking MCP](../../../MCP_Sequential.md)
 
 ### Serena MCP (Memory & Semantic Understanding)
 
@@ -502,7 +502,7 @@ async with ClaudeSDKClient(options=options) as client:
 - Large codebase navigation (>50 files)
 - Session lifecycle management (/sc:load, /sc:save)
 
-**See**: [@MCP_Serena.md](../../../MCP_Serena.md), [@MODE_Task_Management.md](../../../MODE_Task_Management.md)
+**See**: [Serena Memory MCP](../../../MCP_Serena.md), [Task Management Mode](../../../MODE_Task_Management.md)
 
 ### Magic MCP (UI Component Generation)
 
@@ -553,7 +553,7 @@ async with ClaudeSDKClient(options=options) as client:
 - Frontend-specific: responsive, accessible, interactive
 - Component enhancement or refinement
 
-**See**: [@MCP_Magic.md](../../../MCP_Magic.md)
+**See**: [Magic UI MCP](../../../MCP_Magic.md)
 
 ### Context7 MCP (Official Documentation)
 
@@ -597,7 +597,7 @@ async with ClaudeSDKClient(options=options) as client:
 - Official documentation patterns vs generic solutions
 - Version-specific implementation requirements
 
-**See**: [@MCP_Context7.md](../../../MCP_Context7.md)
+**See**: [Context7 Documentation MCP](../../../MCP_Context7.md)
 
 ### Morphllm MCP (Pattern-Based Edits)
 
@@ -640,7 +640,7 @@ async with ClaudeSDKClient(options=options) as client:
 - Bulk text replacements across codebase
 - Token efficiency for large-scale operations
 
-**See**: [@MCP_Morphllm.md](../../../MCP_Morphllm.md)
+**See**: [Morphllm Pattern MCP](../../../MCP_Morphllm.md)
 
 ### Playwright MCP (Browser Automation)
 
@@ -689,7 +689,7 @@ async with ClaudeSDKClient(options=options) as client:
 - Form submission and user interaction testing
 - Accessibility testing (WCAG compliance)
 
-**See**: [@MCP_Playwright.md](../../../MCP_Playwright.md)
+**See**: [Playwright Browser MCP](../../../MCP_Playwright.md)
 
 ### Multi-MCP Framework Orchestration
 
@@ -755,7 +755,7 @@ async with ClaudeSDKClient(options=options) as client:
 - **Sequential**: Structured analysis
 - **Magic**: Production-ready UI
 - **Serena**: Cross-session memory
-- **Orchestration Mode**: Intelligent tool routing [@MODE_Orchestration.md](../../../MODE_Orchestration.md)
+- **Orchestration Mode**: Intelligent tool routing [Orchestration Mode](../../../MODE_Orchestration.md)
 
 ---
 
@@ -1077,32 +1077,32 @@ async with ClaudeSDKClient(options=options) as client:
     # --think-hard activates Sequential MCP for deep analysis
 ```
 
-**See**: [@MODE_Orchestration.md](../../../MODE_Orchestration.md)
+**See**: [Orchestration Mode](../../../MODE_Orchestration.md)
 
-**Pattern 4: RULES.md Enforcement via Hooks**:
+**Pattern 4: Framework Rules Enforcement via Hooks**:
 ```python
 from claude_agent_sdk import HookMatcher
 
 async def enforce_git_safety(input_data, tool_use_id, context):
-    """Implement RULES.md git safety rules"""
+    """Implement Framework Rules git safety rules"""
     if input_data.get("tool_name") == "Bash":
         cmd = input_data.get("tool_input", {}).get("command", "")
 
-        # RULES.md: Never force push to main
+        # Framework Rules: Never force push to main
         if "push --force" in cmd and "main" in cmd:
             return {
                 "hookSpecificOutput": {
                     "permissionDecision": "deny",
-                    "permissionDecisionReason": "Never force push to main (RULES.md)"
+                    "permissionDecisionReason": "Never force push to main (Framework Rules)"
                 }
             }
 
-        # RULES.md: Always Read before Write
+        # Framework Rules: Always Read before Write
         if ">" in cmd and "write" in cmd.lower():
             return {
                 "hookSpecificOutput": {
                     "permissionDecision": "deny",
-                    "permissionDecisionReason": "Use Write tool, not shell redirection (RULES.md)"
+                    "permissionDecisionReason": "Use Write tool, not shell redirection (Framework Rules)"
                 }
             }
 
@@ -1119,7 +1119,7 @@ options = ClaudeAgentOptions(
 )
 ```
 
-**See**: [RULES.md](../../../RULES.md)
+**See**: [Framework Rules](../../../RULES.md)
 
 **Pattern 5: Cross-Session Task Management**:
 ```python
@@ -1162,7 +1162,7 @@ async with ClaudeSDKClient(options=options) as client:
     # TodoWrite state + Serena memory provide full context
 ```
 
-**See**: [@MODE_Task_Management.md](../../../MODE_Task_Management.md), [@MCP_Serena.md](../../../MCP_Serena.md)
+**See**: [Task Management Mode](../../../MODE_Task_Management.md), [Serena Memory MCP](../../../MCP_Serena.md)
 
 ### Tool Permission Strategies
 
@@ -1327,7 +1327,7 @@ async with ClaudeSDKClient(options=options) as client:
 - **Framework MCP**: Specialized capabilities (Sequential, Serena, Magic)
 - **Ecosystem MCP**: Third-party integrations (GitHub, Slack, databases)
 - **Custom MCP**: Domain-specific logic
-- **Orchestration Mode**: Automatic optimal routing [@MODE_Orchestration.md](../../../MODE_Orchestration.md)
+- **Orchestration Mode**: Automatic optimal routing [Orchestration Mode](../../../MODE_Orchestration.md)
 
 ---
 
@@ -1343,4 +1343,4 @@ async with ClaudeSDKClient(options=options) as client:
 
 [**→ Complete Bibliography**](references.md)
 
-[← Back to Index](index.md)
+[← Back to Documentation Index](index.md)

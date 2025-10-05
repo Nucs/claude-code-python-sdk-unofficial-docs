@@ -2,7 +2,7 @@
 
 > **Introduction, history, and fundamental concepts**
 
-[← Back to Index](index.md)
+[← Back to Documentation Index](index.md)
 
 ---
 
@@ -205,7 +205,7 @@ async def safety_check(input_data, tool_use_id, context):
 2. **Automatic Compaction**: Unique context management system[^11]
 3. **In-Process MCP**: Tools run in your app, no separate processes[^9]
 4. **Extended Thinking**: Claude Sonnet 4.5 reasoning capabilities[^5]
-5. **Project Context**: CLAUDE.md integration for domain knowledge[^17]
+5. **Project Context**: [Claude Configuration](../CLAUDE.md) integration for domain knowledge[^17]
 
 ---
 
@@ -340,15 +340,15 @@ npm install @anthropic-ai/claude-agent-sdk
    anyio.run(main)
    ```
 
-[See: Getting Started](getting-started.md) for detailed setup
+[See: Getting Started Guide](getting-started.md) for detailed setup
 
 ### Next Steps
 
-- **Learn Core Concepts**: [Architecture](architecture.md)
+- **Learn Core Concepts**: [Architecture Guide](architecture.md)
 - **Explore API**: [API Reference](api-reference.md)
-- **Build Tools**: [Tools & MCP](tools-and-mcp.md)
+- **Build Tools**: [Tools & MCP Guide](tools-and-mcp.md)
 - **See Examples**: [Real-World Use Cases](real-world-use-cases.md)
-- **Deploy Production**: [Production Patterns](production-patterns.md)
+- **Deploy Production**: [Production Patterns Guide](production-patterns.md)
 
 ---
 
@@ -388,4 +388,4 @@ npm install @anthropic-ai/claude-agent-sdk
 
 [**→ Complete Bibliography**](references.md)
 
-[← Back to Index](index.md)
+[← Back to Documentation Index](index.md)

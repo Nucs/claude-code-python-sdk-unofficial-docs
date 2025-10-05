@@ -2,7 +2,7 @@
 
 > **Installation, setup, and first steps with SuperClaude framework integration**
 
-[← Back to Index](index.md)
+[← Back to Documentation Index](index.md)
 
 ---
 
@@ -228,7 +228,7 @@ The Claude Agent SDK integrates seamlessly with the **SuperClaude framework** - 
 
 ### Core Framework Components
 
-**See**: [CLAUDE.md](../../../CLAUDE.md) for complete architecture
+**See**: [Claude Configuration](../../../CLAUDE.md) for complete architecture
 
 #### 1. CLAUDE.md (Repository Instructions)
 - Project-specific instructions and architecture
@@ -237,26 +237,26 @@ The Claude Agent SDK integrates seamlessly with the **SuperClaude framework** - 
 - Automatically loaded when `setting_sources=["project"]`
 
 #### 2. MODE System (Behavioral Modes)
-- [MODE_Task_Management.md](../../../MODE_Task_Management.md) - TodoWrite integration, memory persistence
-- [MODE_Orchestration.md](../../../MODE_Orchestration.md) - Tool selection optimization
-- [@MODE_Token_Efficiency.md](../../../MODE_Token_Efficiency.md) - Symbol-based compression
-- [@MODE_Introspection.md](../../../MODE_Introspection.md) - Meta-cognitive analysis
-- [@MODE_Brainstorming.md](../../../MODE_Brainstorming.md) - Requirements discovery
-- [@MODE_DeepResearch.md](../../../MODE_DeepResearch.md) - Research workflows
+- [Task Management Mode](../../../MODE_Task_Management.md) - TodoWrite integration, memory persistence
+- [Orchestration Mode](../../../MODE_Orchestration.md) - Tool selection optimization
+- [Token Efficiency Mode](../../../MODE_Token_Efficiency.md) - Symbol-based compression
+- [Introspection Mode](../../../MODE_Introspection.md) - Meta-cognitive analysis
+- [Brainstorming Mode](../../../MODE_Brainstorming.md) - Requirements discovery
+- [Deep Research Mode](../../../MODE_DeepResearch.md) - Research workflows
 
 Activate modes via system prompt flags: `--task-manage`, `--orchestrate`, `--uc`, etc.
 
 #### 3. MCP Servers (Specialized Tools)
-- [@MCP_Sequential.md](../../../MCP_Sequential.md) - Multi-step reasoning engine
-- [@MCP_Magic.md](../../../MCP_Magic.md) - UI component generation (21st.dev)
-- [@MCP_Context7.md](../../../MCP_Context7.md) - Official library documentation
-- [@MCP_Serena.md](../../../MCP_Serena.md) - Semantic understanding & memory
-- [@MCP_Morphllm.md](../../../MCP_Morphllm.md) - Pattern-based bulk edits
-- [@MCP_Playwright.md](../../../MCP_Playwright.md) - Browser automation & E2E testing
+- [Sequential Thinking MCP](../../../MCP_Sequential.md) - Multi-step reasoning engine
+- [Magic UI MCP](../../../MCP_Magic.md) - UI component generation (21st.dev)
+- [Context7 Documentation MCP](../../../MCP_Context7.md) - Official library documentation
+- [Serena Memory MCP](../../../MCP_Serena.md) - Semantic understanding & memory
+- [Morphllm Pattern MCP](../../../MCP_Morphllm.md) - Pattern-based bulk edits
+- [Playwright Browser MCP](../../../MCP_Playwright.md) - Browser automation & E2E testing
 
-#### 4. RULES.md & PRINCIPLES.md
-- [RULES.md](../../../RULES.md) - Safety, quality, and workflow rules
-- [PRINCIPLES.md](../../../PRINCIPLES.md) - SOLID, DRY, KISS engineering principles
+#### 4. Framework Rules & Principles
+- [Framework Rules](../../../RULES.md) - Safety, quality, and workflow rules
+- [Engineering Principles](../../../PRINCIPLES.md) - SOLID, DRY, KISS engineering principles
 
 ### Quick Setup with SuperClaude
 
@@ -313,16 +313,16 @@ options = ClaudeAgentOptions(
 ### Framework Benefits
 
 **Automatic Behaviors**:
-- **Task Management**: TodoWrite tracking, memory persistence (MODE_Task_Management.md)
-- **Tool Optimization**: Intelligent MCP routing (MODE_Orchestration.md)
-- **Safety Enforcement**: RULES.md compliance via hooks
+- **Task Management**: TodoWrite tracking, memory persistence ([Task Management Mode](../../../MODE_Task_Management.md))
+- **Tool Optimization**: Intelligent MCP routing ([Orchestration Mode](../../../MODE_Orchestration.md))
+- **Safety Enforcement**: [Framework Rules](../../../RULES.md) compliance via hooks
 - **Reasoning Enhancement**: Sequential MCP for complex analysis
 - **Cross-Session Memory**: Serena MCP for project context
 
 **See Also**:
-- [tools-and-mcp.md](tools-and-mcp.md) - MCP server integration guide
-- [production-patterns.md](production-patterns.md) - Enterprise deployment patterns
-- [api-reference.md](api-reference.md) - Complete API documentation
+- [Tools & MCP Guide](tools-and-mcp.md) - MCP server integration guide
+- [Production Patterns Guide](production-patterns.md) - Enterprise deployment patterns
+- [API Reference](api-reference.md) - Complete API documentation
 
 ---
 
@@ -924,7 +924,7 @@ async def main():
     )
 
     async for message in query(
-        prompt="Analyze the authentication module following PRINCIPLES.md",
+        prompt="Analyze the authentication module following Engineering Principles",
         options=options
     ):
         print(message)
@@ -933,12 +933,12 @@ anyio.run(main)
 ```
 
 **Framework Behavior**:
-- Loads CLAUDE.md instructions automatically
-- Applies PRINCIPLES.md (SOLID, DRY, KISS) to analysis
-- Follows RULES.md safety and quality standards
+- Loads [Claude Configuration](../../../CLAUDE.md) instructions automatically
+- Applies [Engineering Principles](../../../PRINCIPLES.md) (SOLID, DRY, KISS) to analysis
+- Follows [Framework Rules](../../../RULES.md) safety and quality standards
 - Uses framework-aware file organization
 
-**See**: [CLAUDE.md](../../../CLAUDE.md), [PRINCIPLES.md](../../../PRINCIPLES.md), [RULES.md](../../../RULES.md)
+**See**: [Claude Configuration](../../../CLAUDE.md), [Engineering Principles](../../../PRINCIPLES.md), [Framework Rules](../../../RULES.md)
 
 ### Example 16: MODE Activation
 
@@ -981,10 +981,10 @@ anyio.run(main)
 ```
 
 **MODE Behaviors**:
-- `--task-manage`: Activates TodoWrite tracking, memory persistence [MODE_Task_Management.md](../../../MODE_Task_Management.md)
-- `--orchestrate`: Optimizes tool selection and parallel execution [MODE_Orchestration.md](../../../MODE_Orchestration.md)
-- `--think-hard`: Enables Sequential MCP for deep analysis [@MODE_DeepResearch.md](../../../MODE_DeepResearch.md)
-- `--uc`: Ultra-compressed symbol communication [@MODE_Token_Efficiency.md](../../../MODE_Token_Efficiency.md)
+- `--task-manage`: Activates TodoWrite tracking, memory persistence [Task Management Mode](../../../MODE_Task_Management.md)
+- `--orchestrate`: Optimizes tool selection and parallel execution [Orchestration Mode](../../../MODE_Orchestration.md)
+- `--think-hard`: Enables Sequential MCP for deep analysis [Deep Research Mode](../../../MODE_DeepResearch.md)
+- `--uc`: Ultra-compressed symbol communication [Token Efficiency Mode](../../../MODE_Token_Efficiency.md)
 
 **Available Modes**: `--task-manage`, `--orchestrate`, `--brainstorm`, `--introspect`, `--token-efficient`, `--think`, `--think-hard`, `--ultrathink`
 
@@ -1038,7 +1038,7 @@ anyio.run(main)
 - `--think-hard` flag activates deep analysis mode
 - Systematic investigation following framework patterns
 
-**See**: [@MCP_Sequential.md](../../../MCP_Sequential.md), [tools-and-mcp.md](tools-and-mcp.md)
+**See**: [Sequential Thinking MCP](../../../MCP_Sequential.md), [Tools & MCP Guide](tools-and-mcp.md)
 
 ### Example 18: Cross-Session Memory with Serena
 
@@ -1132,7 +1132,7 @@ anyio.run(session_2_continue)
 - Session 2: `read_memory()` retrieves context from previous session
 - Cross-session learning and context preservation
 
-**See**: [@MCP_Serena.md](../../../MCP_Serena.md), [MODE_Task_Management.md](../../../MODE_Task_Management.md)
+**See**: [Serena Memory MCP](../../../MCP_Serena.md), [Task Management Mode](../../../MODE_Task_Management.md)
 
 ### Example 19: Multi-MCP Orchestration
 
@@ -1195,12 +1195,12 @@ anyio.run(main)
 ```
 
 **Multi-MCP Coordination**:
-- **Context7**: Official React documentation and patterns [@MCP_Context7.md](../../../MCP_Context7.md)
-- **Sequential**: Structured analysis and planning [@MCP_Sequential.md](../../../MCP_Sequential.md)
-- **Magic**: Production-ready UI component generation [@MCP_Magic.md](../../../MCP_Magic.md)
-- **Orchestration Mode**: Intelligent tool routing and optimization [MODE_Orchestration.md](../../../MODE_Orchestration.md)
+- **Context7**: Official React documentation and patterns [Context7 Documentation MCP](../../../MCP_Context7.md)
+- **Sequential**: Structured analysis and planning [Sequential Thinking MCP](../../../MCP_Sequential.md)
+- **Magic**: Production-ready UI component generation [Magic UI MCP](../../../MCP_Magic.md)
+- **Orchestration Mode**: Intelligent tool routing and optimization [Orchestration Mode](../../../MODE_Orchestration.md)
 
-### Example 20: RULES.md Enforcement via Hooks
+### Example 20: Framework Rules Enforcement via Hooks
 
 **Purpose**: Enforce framework safety rules using hook system
 
@@ -1264,13 +1264,13 @@ async def main():
 anyio.run(main)
 ```
 
-**RULES.md Enforcement**:
+**Framework Rules Enforcement**:
 - Git safety: Feature branches only, no force push to main
 - File operations: Read before write/edit
 - Code quality: Run tests before marking complete
 - Professional standards: No marketing language in technical docs
 
-**See**: [RULES.md](../../../RULES.md), [api-reference.md#hooks-system](api-reference.md#hooks-system)
+**See**: [Framework Rules](../../../RULES.md), [API Reference - Hooks System](api-reference.md#hooks-system)
 
 ### Example 21: Real-World Email Agent
 
@@ -1749,19 +1749,19 @@ Error: Failed to connect to MCP server 'sequential'
 ## Next Steps
 
 ### Learn Core Concepts
-- [Architecture](architecture.md) - Understanding the agent loop and internals
+- [Architecture Guide](architecture.md) - Understanding the agent loop and internals
 - [API Reference](api-reference.md) - Complete API documentation with SuperClaude integration
 
 ### Build with Tools
-- [Tools & MCP](tools-and-mcp.md) - Custom tools and MCP integration with framework
+- [Tools & MCP Guide](tools-and-mcp.md) - Custom tools and MCP integration with framework
 - [Real-World Use Cases](real-world-use-cases.md) - Practical SuperClaude examples
 
 ### Deploy to Production
-- [Production Patterns](production-patterns.md) - Enterprise deployment with framework
-- [Security](security.md) - Best practices and security
+- [Production Patterns Guide](production-patterns.md) - Enterprise deployment with framework
+- [Security Best Practices](security.md) - Best practices and security
 
 ### Optimize Performance
-- [Performance & Optimization](performance-optimization.md) - Benchmarks and cost optimization
+- [Performance Optimization Guide](performance-optimization.md) - Benchmarks and cost optimization
 
 ---
 
@@ -1780,14 +1780,14 @@ Error: Failed to connect to MCP server 'sequential'
 - [ ] Configure setting_sources=["project"]
 - [ ] Test MODE activation (--task-manage, --orchestrate)
 - [ ] Install MCP servers (Sequential, Serena, Magic)
-- [ ] Configure hooks for RULES.md enforcement
+- [ ] Configure hooks for Framework Rules enforcement
 - [ ] Test cross-session memory with Serena
 
 **Next Steps**:
 - [ ] Explore [Real-World Use Cases](real-world-use-cases.md)
-- [ ] Read [Architecture](architecture.md) guide
-- [ ] Review [Security](security.md) best practices
-- [ ] Study [Tools & MCP](tools-and-mcp.md) integration patterns
+- [ ] Read [Architecture Guide](architecture.md)
+- [ ] Review [Security Best Practices](security.md)
+- [ ] Study [Tools & MCP Guide](tools-and-mcp.md) integration patterns
 
 ---
 
@@ -1802,4 +1802,4 @@ Error: Failed to connect to MCP server 'sequential'
 
 [**→ Complete Bibliography**](references.md)
 
-[← Back to Index](index.md)
+[← Back to Documentation Index](index.md)

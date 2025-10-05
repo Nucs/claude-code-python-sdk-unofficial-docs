@@ -2,7 +2,7 @@
 
 > **Best practices, vulnerabilities, and mitigation strategies**
 
-[← Back to Index](index.md)
+[← Back to Documentation Index](index.md)
 
 ---
 
@@ -705,4 +705,4 @@ options = ClaudeAgentOptions(
 
 [**→ Complete Bibliography**](references.md)
 
-[← Back to Index](index.md)
+[← Back to Documentation Index](index.md)

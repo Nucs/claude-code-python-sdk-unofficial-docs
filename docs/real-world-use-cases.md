@@ -2,7 +2,7 @@
 
 > **Production-grade implementations with verified metrics, SuperClaude framework integration, and evidence-based outcomes**
 
-[← Back to Index](index.md)
+[← Back to Documentation Index](index.md)
 
 ---
 
