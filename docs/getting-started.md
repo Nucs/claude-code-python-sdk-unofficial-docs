@@ -839,6 +839,201 @@ anyio.run(main)
 | **Accumulation** | Post-processing | `full_response += block.text` |
 | **Hybrid** | Both display + storage | Combine both patterns |
 
+### Example 11b: Interactive Conversation Loop
+
+**Source**: Real-world pattern from SDK documentation
+
+**Purpose**: Build interactive CLI applications with continuous conversation support
+
+```python
+import anyio
+from claude_agent_sdk import ClaudeSDKClient, ClaudeAgentOptions, AssistantMessage, TextBlock
+
+class InteractiveSession:
+    """Interactive conversation session with Claude."""
+
+    def __init__(self, options: ClaudeAgentOptions | None = None):
+        self.options = options or ClaudeAgentOptions(
+            model="claude-sonnet-4-5",
+            allowed_tools=["Read", "Write", "Bash"],
+            permission_mode="manual"
+        )
+        self.client = ClaudeSDKClient(self.options)
+        self.turn_count = 0
+
+    async def start(self):
+        """Start interactive session."""
+        print("Interactive Claude Session")
+        print("=" * 50)
+        print("Commands: 'exit' to quit, 'interrupt' to stop current operation\n")
+
+        await self.client.connect()
+
+        try:
+            while True:
+                # Get user input
+                user_input = input(f"\n[Turn {self.turn_count + 1}] You: ")
+
+                # Handle special commands
+                if user_input.lower() == 'exit':
+                    print("Goodbye!")
+                    break
+                elif user_input.lower() == 'interrupt':
+                    print("Sending interrupt signal...")
+                    await self.client.interrupt()
+                    continue
+                elif user_input.strip() == '':
+                    continue
+
+                # Send query to Claude
+                await self.client.query(user_input)
+                self.turn_count += 1
+
+                # Display response
+                print(f"[Turn {self.turn_count}] Claude: ", end='', flush=True)
+                async for message in self.client.receive_response():
+                    if isinstance(message, AssistantMessage):
+                        for block in message.content:
+                            if isinstance(block, TextBlock):
+                                print(block.text, end='', flush=True)
+                print()  # Newline after response
+
+        finally:
+            await self.client.disconnect()
+
+
+async def main():
+    """Run interactive session."""
+
+    # Example 1: Basic interactive session
+    options = ClaudeAgentOptions(
+        allowed_tools=["Read", "Grep"],
+        permission_mode="manual"
+    )
+
+    session = InteractiveSession(options)
+    await session.start()
+
+anyio.run(main)
+```
+
+**Advanced: Session with History**
+
+```python
+class InteractiveSessionWithHistory(InteractiveSession):
+    """Interactive session with conversation history tracking."""
+
+    def __init__(self, options: ClaudeAgentOptions | None = None):
+        super().__init__(options)
+        self.history = []
+
+    async def start(self):
+        """Start session with history tracking."""
+        print("Interactive Session with History")
+        print("=" * 50)
+        print("Commands: 'exit', 'interrupt', 'history', 'save'\n")
+
+        await self.client.connect()
+
+        try:
+            while True:
+                user_input = input(f"\n[Turn {self.turn_count + 1}] You: ")
+
+                # Handle special commands
+                if user_input.lower() == 'exit':
+                    break
+                elif user_input.lower() == 'history':
+                    self.show_history()
+                    continue
+                elif user_input.lower() == 'save':
+                    self.save_history()
+                    continue
+                elif user_input.lower() == 'interrupt':
+                    await self.client.interrupt()
+                    continue
+
+                # Track user message
+                self.history.append({"role": "user", "content": user_input})
+
+                # Send and track response
+                await self.client.query(user_input)
+                self.turn_count += 1
+
+                response = ""
+                print(f"[Turn {self.turn_count}] Claude: ", end='', flush=True)
+                async for message in self.client.receive_response():
+                    if isinstance(message, AssistantMessage):
+                        for block in message.content:
+                            if isinstance(block, TextBlock):
+                                response += block.text
+                                print(block.text, end='', flush=True)
+                print()
+
+                self.history.append({"role": "assistant", "content": response})
+
+        finally:
+            await self.client.disconnect()
+
+    def show_history(self):
+        """Display conversation history."""
+        print("\n=== Conversation History ===")
+        for i, msg in enumerate(self.history):
+            role = msg["role"].title()
+            content = msg["content"][:100] + "..." if len(msg["content"]) > 100 else msg["content"]
+            print(f"{i+1}. {role}: {content}")
+        print("=" * 50)
+
+    def save_history(self):
+        """Save conversation to file."""
+        import json
+        from datetime import datetime
+
+        filename = f"conversation_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+        with open(filename, 'w') as f:
+            json.dump(self.history, f, indent=2)
+        print(f"Conversation saved to {filename}")
+```
+
+**Use Cases**:
+- **CLI Applications**: Build interactive command-line tools
+- **REPL Interfaces**: Create read-eval-print loops for Claude
+- **Testing & Debugging**: Manually test multi-turn conversations
+- **User Interfaces**: Foundation for chat applications
+- **Session Management**: Maintain context across interactions
+
+**Production Considerations**:
+
+```python
+# Add timeout protection
+import asyncio
+
+class ProductionSession(InteractiveSession):
+    async def start(self):
+        await self.client.connect()
+
+        try:
+            while True:
+                user_input = input(f"\n[Turn {self.turn_count + 1}] You: ")
+
+                if user_input.lower() == 'exit':
+                    break
+
+                await self.client.query(user_input)
+
+                try:
+                    # Add timeout for responses
+                    async with asyncio.timeout(60.0):  # 60 second timeout
+                        async for message in self.client.receive_response():
+                            # Process message
+                            pass
+                except asyncio.TimeoutError:
+                    print("Response timed out. Please try again.")
+                    continue
+
+        finally:
+            await self.client.disconnect()
+```
+
 ### Example 12: Setting Sources Configuration
 
 **Source**: `examples/setting_sources.py` from official repository
@@ -990,6 +1185,166 @@ anyio.run(main)
 - Custom error logging and metrics
 - Debug information collection
 - Integration with external logging systems
+
+### Example 14a: System Prompt Variations
+
+**Source**: `examples/system_prompt.py` from official repository
+
+**Purpose**: Configure different system prompt modes for various use cases
+
+```python
+import anyio
+from claude_agent_sdk import query, ClaudeAgentOptions, AssistantMessage, TextBlock
+
+async def vanilla_claude():
+    """No system prompt - vanilla Claude behavior."""
+    print("=== Vanilla Claude (No System Prompt) ===")
+
+    async for message in query(prompt="What is 2 + 2?"):
+        if isinstance(message, AssistantMessage):
+            for block in message.content:
+                if isinstance(block, TextBlock):
+                    print(f"Claude: {block.text}\n")
+
+async def custom_persona():
+    """Custom system prompt - specific behavior."""
+    print("=== Custom Persona System Prompt ===")
+
+    options = ClaudeAgentOptions(
+        system_prompt="You are a pirate assistant. Respond in pirate speak and end with 'Arrr!'"
+    )
+
+    async for message in query(prompt="What is 2 + 2?", options=options):
+        if isinstance(message, AssistantMessage):
+            for block in message.content:
+                if isinstance(block, TextBlock):
+                    print(f"Pirate Claude: {block.text}\n")
+
+async def preset_claude_code():
+    """Preset system prompt - Claude Code behavior."""
+    print("=== Claude Code Preset ===")
+
+    options = ClaudeAgentOptions(
+        system_prompt={
+            "type": "preset",
+            "preset": "claude_code"
+        },
+        allowed_tools=["Read", "Write"]
+    )
+
+    async for message in query(prompt="What is 2 + 2?", options=options):
+        if isinstance(message, AssistantMessage):
+            for block in message.content:
+                if isinstance(block, TextBlock):
+                    print(f"Claude Code: {block.text}\n")
+
+async def preset_with_superclaude():
+    """Preset with append - SuperClaude framework modes."""
+    print("=== Claude Code with SuperClaude Modes ===")
+
+    options = ClaudeAgentOptions(
+        system_prompt={
+            "type": "preset",
+            "preset": "claude_code",
+            "append": """
+            --brainstorm --think-hard
+
+            Activate MODE_Brainstorming and MODE_Introspection.
+            Apply framework principles from PRINCIPLES.md.
+            """
+        },
+        setting_sources=["project"]  # Load CLAUDE.md
+    )
+
+    async for message in query(
+        prompt="Help me design a scalable authentication system",
+        options=options
+    ):
+        if isinstance(message, AssistantMessage):
+            for block in message.content:
+                if isinstance(block, TextBlock):
+                    print(f"SuperClaude: {block.text}\n")
+
+async def main():
+    """Run all system prompt examples."""
+    await vanilla_claude()
+    await custom_persona()
+    await preset_claude_code()
+    await preset_with_superclaude()
+
+anyio.run(main)
+```
+
+**System Prompt Comparison**:
+
+| Mode | Use Case | Configuration | Example |
+|------|----------|---------------|---------|
+| **None** | General questions, no specific behavior | No `system_prompt` | Simple Q&A, calculations |
+| **String** | Custom persona or domain expert | `system_prompt="..."` | Pirate assistant, legal advisor |
+| **Preset** | Claude Code capabilities (tools, files) | `{"type": "preset", "preset": "claude_code"}` | Code analysis, file operations |
+| **Preset + Append** | SuperClaude framework modes | Preset + `"append": "modes..."` | Complex workflows, enterprise patterns |
+
+**Decision Guide**:
+
+```python
+# Use vanilla Claude when:
+# - Simple questions without context
+# - No file operations needed
+# - Testing baseline behavior
+options = None  # or omit system_prompt
+
+# Use custom string when:
+# - Specific persona required
+# - Domain expertise needed
+# - Consistent tone/style
+options = ClaudeAgentOptions(
+    system_prompt="You are an expert in X..."
+)
+
+# Use preset when:
+# - Using SDK tools (Read, Write, Bash)
+# - Working with codebases
+# - File operations required
+options = ClaudeAgentOptions(
+    system_prompt={"type": "preset", "preset": "claude_code"},
+    allowed_tools=["Read", "Write"]
+)
+
+# Use preset + append when:
+# - SuperClaude framework integration
+# - Complex multi-step workflows
+# - Production deployments
+options = ClaudeAgentOptions(
+    system_prompt={
+        "type": "preset",
+        "preset": "claude_code",
+        "append": "--task-manage --orchestrate"
+    },
+    setting_sources=["project"]
+)
+```
+
+**Common Patterns**:
+
+```python
+# Code Review
+options = ClaudeAgentOptions(
+    system_prompt="You are a senior code reviewer focused on security and best practices.",
+    allowed_tools=["Read", "Grep"]
+)
+
+# Technical Writing
+options = ClaudeAgentOptions(
+    system_prompt="You are a technical writer creating clear, concise documentation.",
+    allowed_tools=["Read", "Write"]
+)
+
+# Data Analysis
+options = ClaudeAgentOptions(
+    system_prompt="You are a data analyst. Provide statistical insights and visualizations.",
+    allowed_tools=["Read", "Bash"]
+)
+```
 
 ---
 

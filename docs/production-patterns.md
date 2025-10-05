@@ -773,6 +773,349 @@ options = ClaudeAgentOptions(permission_mode='acceptAll')
 
 Production security patterns for enterprise deployment.[^3]
 
+### Advanced Permission Callbacks
+
+**Pattern**: Dynamic permission control with context-aware decisions
+
+#### Path Redirection for Sandboxing
+
+```python
+from claude_agent_sdk import ClaudeAgentOptions
+import os
+
+async def sandbox_permission_handler(
+    tool_name: str,
+    input_data: dict,
+    context: dict
+):
+    """Redirect sensitive operations to sandbox directories."""
+
+    # Block writes to system directories
+    if tool_name == "Write" and input_data.get("file_path", "").startswith("/system/"):
+        return {
+            "behavior": "deny",
+            "message": "System directory write not allowed",
+            "interrupt": True
+        }
+
+    # Redirect config files to sandbox
+    if tool_name in ["Write", "Edit"]:
+        file_path = input_data.get("file_path", "")
+
+        # Redirect /etc/ writes to sandbox
+        if file_path.startswith("/etc/"):
+            sandbox_path = f"/opt/sandbox{file_path}"
+            os.makedirs(os.path.dirname(sandbox_path), exist_ok=True)
+
+            return {
+                "behavior": "allow",
+                "updatedInput": {
+                    **input_data,
+                    "file_path": sandbox_path
+                },
+                "systemMessage": f"Redirected to sandbox: {sandbox_path}"
+            }
+
+        # Redirect sensitive directories
+        sensitive_prefixes = ["/var/log/", "/root/", "~/.ssh/"]
+        for prefix in sensitive_prefixes:
+            if file_path.startswith(prefix):
+                sandbox_path = f"/opt/sandbox{file_path}"
+                os.makedirs(os.path.dirname(sandbox_path), exist_ok=True)
+
+                return {
+                    "behavior": "allow",
+                    "updatedInput": {**input_data, "file_path": sandbox_path}
+                }
+
+    return {"behavior": "allow", "updatedInput": input_data}
+
+
+# Usage
+options = ClaudeAgentOptions(
+    can_use_tool=sandbox_permission_handler,
+    allowed_tools=["Read", "Write", "Edit", "Bash"]
+)
+```
+
+#### Multi-Layer Permission Strategy
+
+```python
+from typing import Callable
+import logging
+
+logger = logging.getLogger(__name__)
+
+class PermissionLayer:
+    """Layered permission system with different strategies."""
+
+    def __init__(self):
+        self.layers = []
+
+    def add_layer(self, name: str, handler: Callable):
+        """Add a permission layer."""
+        self.layers.append({"name": name, "handler": handler})
+
+    async def check_permission(
+        self,
+        tool_name: str,
+        input_data: dict,
+        context: dict
+    ):
+        """Check all permission layers in order."""
+
+        for layer in self.layers:
+            try:
+                result = await layer["handler"](tool_name, input_data, context)
+
+                # If any layer denies, stop and deny
+                if result.get("behavior") == "deny":
+                    logger.warning(
+                        f"Permission denied by layer '{layer['name']}': "
+                        f"{result.get('message', 'No reason provided')}"
+                    )
+                    return result
+
+                # If layer modified input, use modified version for next layer
+                if "updatedInput" in result:
+                    input_data = result["updatedInput"]
+
+            except Exception as e:
+                logger.error(f"Error in permission layer '{layer['name']}': {e}")
+                # Fail closed - deny on error
+                return {
+                    "behavior": "deny",
+                    "message": f"Permission check failed: {e}",
+                    "interrupt": True
+                }
+
+        # All layers passed
+        return {"behavior": "allow", "updatedInput": input_data}
+
+
+# Define permission layers
+
+async def sensitive_data_protection(tool_name: str, input_data: dict, context: dict):
+    """Block access to sensitive data patterns."""
+
+    if tool_name == "Read":
+        file_path = input_data.get("file_path", "")
+
+        # Block credential files
+        sensitive_files = [
+            ".env", "credentials.json", ".aws/credentials",
+            ".ssh/id_rsa", "secrets.yaml"
+        ]
+
+        if any(pattern in file_path for pattern in sensitive_files):
+            return {
+                "behavior": "deny",
+                "message": f"Access to sensitive file blocked: {file_path}"
+            }
+
+    if tool_name == "Bash":
+        cmd = input_data.get("command", "")
+
+        # Block commands that might expose secrets
+        if any(keyword in cmd for keyword in ["cat .env", "echo $AWS", "printenv"]):
+            return {
+                "behavior": "deny",
+                "message": "Command may expose sensitive environment variables"
+            }
+
+    return {"behavior": "allow", "updatedInput": input_data}
+
+
+async def rate_limiting(tool_name: str, input_data: dict, context: dict):
+    """Rate limit expensive operations."""
+    import time
+
+    # Track operation counts
+    if not hasattr(rate_limiting, "counts"):
+        rate_limiting.counts = {}
+        rate_limiting.window_start = time.time()
+
+    # Reset window every 60 seconds
+    if time.time() - rate_limiting.window_start > 60:
+        rate_limiting.counts = {}
+        rate_limiting.window_start = time.time()
+
+    # Count operations
+    rate_limiting.counts[tool_name] = rate_limiting.counts.get(tool_name, 0) + 1
+
+    # Bash commands limited to 10/minute
+    if tool_name == "Bash" and rate_limiting.counts[tool_name] > 10:
+        return {
+            "behavior": "deny",
+            "message": "Rate limit exceeded for Bash operations (10/min)"
+        }
+
+    # Write operations limited to 20/minute
+    if tool_name in ["Write", "Edit"] and rate_limiting.counts.get("Write", 0) + rate_limiting.counts.get("Edit", 0) > 20:
+        return {
+            "behavior": "deny",
+            "message": "Rate limit exceeded for file write operations (20/min)"
+        }
+
+    return {"behavior": "allow", "updatedInput": input_data}
+
+
+async def audit_logging(tool_name: str, input_data: dict, context: dict):
+    """Log all operations for audit trail."""
+    import json
+    from datetime import datetime
+
+    audit_entry = {
+        "timestamp": datetime.now().isoformat(),
+        "tool": tool_name,
+        "input": input_data,
+        "context": context
+    }
+
+    # Write to audit log
+    with open("/var/log/claude-agent-audit.log", "a") as f:
+        f.write(json.dumps(audit_entry) + "\n")
+
+    return {"behavior": "allow", "updatedInput": input_data}
+
+
+# Assemble permission layers
+permission_system = PermissionLayer()
+permission_system.add_layer("sensitive_data", sensitive_data_protection)
+permission_system.add_layer("rate_limiting", rate_limiting)
+permission_system.add_layer("audit", audit_logging)
+
+# Use in SDK
+options = ClaudeAgentOptions(
+    can_use_tool=permission_system.check_permission,
+    allowed_tools=["Read", "Write", "Bash"]
+)
+```
+
+#### Role-Based Access Control (RBAC)
+
+```python
+from enum import Enum
+
+class Role(Enum):
+    ADMIN = "admin"
+    DEVELOPER = "developer"
+    ANALYST = "analyst"
+    VIEWER = "viewer"
+
+
+class RBACPermissionHandler:
+    """Role-based access control for SDK operations."""
+
+    def __init__(self, user_role: Role):
+        self.role = user_role
+
+        # Define permissions per role
+        self.permissions = {
+            Role.ADMIN: {
+                "allowed_tools": ["Read", "Write", "Edit", "Bash", "Grep", "Glob"],
+                "allowed_paths": ["*"],
+                "allowed_commands": ["*"]
+            },
+            Role.DEVELOPER: {
+                "allowed_tools": ["Read", "Write", "Edit", "Grep", "Glob"],
+                "allowed_paths": ["/src/**", "/tests/**", "/docs/**"],
+                "allowed_commands": ["git*", "npm*", "pytest*"]
+            },
+            Role.ANALYST: {
+                "allowed_tools": ["Read", "Grep", "Glob"],
+                "allowed_paths": ["/data/**", "/reports/**"],
+                "allowed_commands": ["git status", "git log"]
+            },
+            Role.VIEWER: {
+                "allowed_tools": ["Read", "Grep"],
+                "allowed_paths": ["/docs/**", "/README.md"],
+                "allowed_commands": []
+            }
+        }
+
+    async def check_permission(
+        self,
+        tool_name: str,
+        input_data: dict,
+        context: dict
+    ):
+        """Check permission based on user role."""
+
+        role_perms = self.permissions[self.role]
+
+        # Check tool access
+        if tool_name not in role_perms["allowed_tools"]:
+            return {
+                "behavior": "deny",
+                "message": f"Role '{self.role.value}' not authorized for tool '{tool_name}'"
+            }
+
+        # Check path access for file operations
+        if tool_name in ["Read", "Write", "Edit"]:
+            file_path = input_data.get("file_path", "")
+
+            if not any(
+                self._match_pattern(file_path, pattern)
+                for pattern in role_perms["allowed_paths"]
+            ):
+                return {
+                    "behavior": "deny",
+                    "message": f"Role '{self.role.value}' not authorized to access '{file_path}'"
+                }
+
+        # Check command access for Bash
+        if tool_name == "Bash":
+            cmd = input_data.get("command", "")
+
+            if not any(
+                self._match_pattern(cmd, pattern)
+                for pattern in role_perms["allowed_commands"]
+            ):
+                return {
+                    "behavior": "deny",
+                    "message": f"Role '{self.role.value}' not authorized to run command"
+                }
+
+        return {"behavior": "allow", "updatedInput": input_data}
+
+    def _match_pattern(self, value: str, pattern: str) -> bool:
+        """Simple pattern matching with wildcards."""
+        if pattern == "*":
+            return True
+
+        import fnmatch
+        return fnmatch.fnmatch(value, pattern)
+
+
+# Usage
+async def main():
+    # Developer role - limited access
+    rbac_handler = RBACPermissionHandler(Role.DEVELOPER)
+
+    options = ClaudeAgentOptions(
+        can_use_tool=rbac_handler.check_permission,
+        allowed_tools=["Read", "Write", "Bash", "Grep"]
+    )
+
+    async with ClaudeSDKClient(options=options) as client:
+        # Allowed: read source files
+        await client.query("Read /src/main.py")
+
+        # Denied: write to system files
+        await client.query("Write to /etc/config")
+
+        # Denied: dangerous bash commands
+        await client.query("Run: rm -rf /")
+```
+
+**Benefits**:
+- **Granular Control**: Per-operation permission decisions
+- **Security Layers**: Multiple security checks in sequence
+- **Audit Trail**: Complete operation logging
+- **Dynamic Policies**: Runtime permission adjustment
+- **Role Separation**: User-based access control
+
 ### OAuth 2.1 Authentication
 
 **MCP Server with OAuth**:
