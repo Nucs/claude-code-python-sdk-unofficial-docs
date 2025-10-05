@@ -23,13 +23,15 @@
 ### System Requirements
 
 **Python SDK**:
-- Python 3.10 or higher[^1]
+- **Python 3.10+** (explicitly required)[^1]
 - pip package manager
 - Virtual environment (recommended)
+- Claude Code CLI 2.0.0+ (for full integration features)
 
 **TypeScript SDK**:
-- Node.js 18 or higher[^1]
+- **Node.js 18+** (explicitly required)[^1]
 - npm or yarn package manager
+- Claude Code CLI 2.0.0+ (for full integration features)
 
 **Optional**:
 - Claude Code CLI (for local integration)[^2]
@@ -328,39 +330,51 @@ options = ClaudeAgentOptions(
 
 ### Example 1: Simple Query (Python)
 
+**Based on**: Official quick_start.py example
+
 ```python
 import anyio
-from claude_agent_sdk import query
+from claude_agent_sdk import query, AssistantMessage, TextBlock
 
 async def main():
     async for message in query(prompt="What is 2 + 2?"):
-        print(message)
+        if isinstance(message, AssistantMessage):
+            for block in message.content:
+                if isinstance(block, TextBlock):
+                    print(f"Claude: {block.text}")
 
 anyio.run(main)
 ```
 
+> **Note**: Official SDK examples use `anyio.run()` instead of `asyncio.run()` for better compatibility with different async environments (including Jupyter notebooks).
+
 **Output**:
 ```
-2 + 2 equals 4.
+Claude: 2 + 2 equals 4.
 ```
 
 ### Example 2: Query with Options (Python)
 
+**Based on**: Official quick_start.py with_options_example
+
 ```python
 import anyio
-from claude_agent_sdk import query, ClaudeAgentOptions
+from claude_agent_sdk import query, ClaudeAgentOptions, AssistantMessage, TextBlock
 
 async def main():
     options = ClaudeAgentOptions(
-        system_prompt="You are a helpful Python expert",
-        max_tokens=1024
+        system_prompt="You are a helpful assistant that explains things simply.",
+        max_turns=1  # Limit to single turn for efficiency
     )
 
     async for message in query(
-        prompt="Explain list comprehensions",
+        prompt="Explain what Python is in one sentence.",
         options=options
     ):
-        print(message)
+        if isinstance(message, AssistantMessage):
+            for block in message.content:
+                if isinstance(block, TextBlock):
+                    print(f"Claude: {block.text}")
 
 anyio.run(main)
 ```
@@ -388,24 +402,33 @@ anyio.run(main)
 
 ### Example 4: File Operations (Python)
 
+**Based on**: Official quick_start.py with_tools_example
+
 ```python
 import anyio
-from claude_agent_sdk import query, ClaudeAgentOptions
+from claude_agent_sdk import query, ClaudeAgentOptions, AssistantMessage, ResultMessage, TextBlock
 
 async def main():
     options = ClaudeAgentOptions(
         allowed_tools=["Read", "Write"],
-        permission_mode='ask'  # Prompt for permission
+        system_prompt="You are a helpful file assistant."
     )
 
-    async for msg in query(
-        prompt="Create a file called hello.txt with 'Hello, World!'",
+    async for message in query(
+        prompt="Create a file called hello.txt with 'Hello, World!' in it",
         options=options
     ):
-        print(msg)
+        if isinstance(message, AssistantMessage):
+            for block in message.content:
+                if isinstance(block, TextBlock):
+                    print(f"Claude: {block.text}")
+        elif isinstance(message, ResultMessage) and message.total_cost_usd and message.total_cost_usd > 0:
+            print(f"\nCost: ${message.total_cost_usd:.4f}")
 
 anyio.run(main)
 ```
+
+> **Tip**: Track costs in production using `ResultMessage.total_cost_usd` to monitor API usage.
 
 ### Example 5: Custom Tool (Python)
 
@@ -490,9 +513,188 @@ main();
 
 ---
 
+## Official SDK Examples
+
+These examples are based on the [official Anthropic SDK repository](https://github.com/anthropics/claude-agent-sdk-python/tree/main/examples). All 12 official examples demonstrate production-ready patterns.
+
+### Example 8: Custom Agent Definition
+
+**Source**: `examples/agents.py` from official repository
+
+**Purpose**: Define specialized agents with custom prompts and tool access
+
+```python
+import anyio
+from claude_agent_sdk import (
+    AgentDefinition,
+    AssistantMessage,
+    ClaudeAgentOptions,
+    ResultMessage,
+    TextBlock,
+    query,
+)
+
+async def code_reviewer_example():
+    """Custom code reviewer agent with restricted tools."""
+
+    options = ClaudeAgentOptions(
+        agents={
+            "code-reviewer": AgentDefinition(
+                description="Reviews code for best practices and potential issues",
+                prompt="""You are a code reviewer. Analyze code for bugs, performance issues,
+                security vulnerabilities, and adherence to best practices.
+                Provide constructive feedback.""",
+                tools=["Read", "Grep"],  # Limited to read-only operations
+                model="sonnet",  # Specify model for this agent
+            ),
+        },
+    )
+
+    async for message in query(
+        prompt="Use the code-reviewer agent to review the code in src/main.py",
+        options=options,
+    ):
+        if isinstance(message, AssistantMessage):
+            for block in message.content:
+                if isinstance(block, TextBlock):
+                    print(f"Reviewer: {block.text}")
+        elif isinstance(message, ResultMessage) and message.total_cost_usd:
+            print(f"\nCost: ${message.total_cost_usd:.4f}")
+
+anyio.run(code_reviewer_example)
+```
+
+**Key Patterns**:
+- `AgentDefinition` for specialized personas
+- `tools` parameter restricts agent capabilities
+- `model` parameter allows per-agent model selection
+- Cost tracking via `ResultMessage.total_cost_usd`
+
+**Available Models**: `"sonnet"`, `"opus"`, `"haiku"`, `"inherit"` (uses parent model)
+
+### Example 9: Safety Hooks
+
+**Source**: `examples/hooks.py` from official repository
+
+**Purpose**: Implement safety controls using PreToolUse hooks
+
+```python
+import anyio
+from claude_agent_sdk import ClaudeAgentOptions, HookMatcher, query
+
+async def block_dangerous_commands(input_data, tool_use_id, context):
+    """Hook to block potentially dangerous bash commands."""
+
+    tool_name = input_data.get('tool_name')
+    if tool_name == "Bash":
+        command = input_data.get('tool_input', {}).get('command', '')
+
+        # Block dangerous operations
+        dangerous_patterns = ['rm -rf /', 'dd if=', 'mkfs', ':(){:|:&};:']
+
+        for pattern in dangerous_patterns:
+            if pattern in command:
+                return {
+                    'hookSpecificOutput': {
+                        'hookEventName': 'PreToolUse',
+                        'permissionDecision': 'deny',
+                        'permissionDecisionReason': f'Blocked dangerous command pattern: {pattern}'
+                    }
+                }
+
+    return {}  # Allow if no dangerous patterns found
+
+async def safety_example():
+    options = ClaudeAgentOptions(
+        allowed_tools=["Bash"],
+        hooks={
+            'PreToolUse': [
+                HookMatcher(matcher='Bash', hooks=[block_dangerous_commands])
+            ]
+        }
+    )
+
+    async for message in query(
+        prompt="List files in the current directory",
+        options=options
+    ):
+        print(message)
+
+anyio.run(safety_example)
+```
+
+**Hook Return Structure**:
+```python
+{
+    'hookSpecificOutput': {
+        'hookEventName': 'PreToolUse',  # Hook type
+        'permissionDecision': 'deny',   # 'allow' or 'deny'
+        'permissionDecisionReason': str  # Human-readable explanation
+    }
+}
+```
+
+### Example 10: Documentation Writer Agent
+
+**Source**: `examples/agents.py` - doc-writer agent
+
+**Purpose**: Multi-agent workflow with different specializations
+
+```python
+import anyio
+from claude_agent_sdk import AgentDefinition, ClaudeAgentOptions, query
+
+async def multi_agent_documentation():
+    """Use multiple specialized agents in one workflow."""
+
+    options = ClaudeAgentOptions(
+        agents={
+            "code-reviewer": AgentDefinition(
+                description="Reviews code for best practices",
+                prompt="Expert code reviewer focusing on quality and security.",
+                tools=["Read", "Grep"],
+                model="sonnet",
+            ),
+            "doc-writer": AgentDefinition(
+                description="Writes comprehensive documentation",
+                prompt="""Technical documentation expert. Write clear, comprehensive
+                documentation with examples. Focus on clarity and completeness.""",
+                tools=["Read", "Write", "Edit"],
+                model="sonnet",
+            ),
+            "test-writer": AgentDefinition(
+                description="Creates comprehensive test suites",
+                prompt="Test engineer. Write thorough unit and integration tests.",
+                tools=["Read", "Write", "Bash"],
+                model="haiku",  # Faster model for test generation
+            ),
+        },
+    )
+
+    async for message in query(
+        prompt="""
+        1. Use code-reviewer to analyze src/auth.py
+        2. Use doc-writer to create documentation based on the review
+        3. Use test-writer to generate tests for the documented API
+        """,
+        options=options,
+    ):
+        print(message)
+
+anyio.run(multi_agent_documentation)
+```
+
+**Agent Orchestration Benefits**:
+- Specialized expertise per task
+- Cost optimization (haiku for simpler tasks)
+- Security via tool restrictions
+- Parallel execution when possible
+
+---
+
 ## SuperClaude Integration Examples
 
-### Example 8: Framework-Aware Query
+### Example 11: Framework-Aware Query
 
 **Purpose**: Load CLAUDE.md and activate SuperClaude framework features
 
@@ -536,7 +738,7 @@ anyio.run(main)
 
 **See**: [CLAUDE.md](../../../CLAUDE.md), [PRINCIPLES.md](../../../PRINCIPLES.md), [RULES.md](../../../RULES.md)
 
-### Example 9: MODE Activation
+### Example 12: MODE Activation
 
 **Purpose**: Activate behavioral modes for specialized workflows
 
@@ -584,7 +786,7 @@ anyio.run(main)
 
 **Available Modes**: `--task-manage`, `--orchestrate`, `--brainstorm`, `--introspect`, `--token-efficient`, `--think`, `--think-hard`, `--ultrathink`
 
-### Example 10: MCP Server Integration
+### Example 13: MCP Server Integration
 
 **Purpose**: Use Sequential MCP for complex multi-step reasoning
 
@@ -636,7 +838,7 @@ anyio.run(main)
 
 **See**: [@MCP_Sequential.md](../../../MCP_Sequential.md), [tools-and-mcp.md](tools-and-mcp.md)
 
-### Example 11: Cross-Session Memory with Serena
+### Example 14: Cross-Session Memory with Serena
 
 **Purpose**: Persist context across multiple sessions using Serena MCP
 
@@ -730,7 +932,7 @@ anyio.run(session_2_continue)
 
 **See**: [@MCP_Serena.md](../../../MCP_Serena.md), [MODE_Task_Management.md](../../../MODE_Task_Management.md)
 
-### Example 12: Multi-MCP Orchestration
+### Example 15: Multi-MCP Orchestration
 
 **Purpose**: Coordinate multiple MCP servers for comprehensive workflows
 
@@ -796,7 +998,7 @@ anyio.run(main)
 - **Magic**: Production-ready UI component generation [@MCP_Magic.md](../../../MCP_Magic.md)
 - **Orchestration Mode**: Intelligent tool routing and optimization [MODE_Orchestration.md](../../../MODE_Orchestration.md)
 
-### Example 13: RULES.md Enforcement via Hooks
+### Example 16: RULES.md Enforcement via Hooks
 
 **Purpose**: Enforce framework safety rules using hook system
 
@@ -868,7 +1070,7 @@ anyio.run(main)
 
 **See**: [RULES.md](../../../RULES.md), [api-reference.md#hooks-system](api-reference.md#hooks-system)
 
-### Example 14: Real-World Email Agent
+### Example 17: Real-World Email Agent
 
 **Based on**: Anthropic's email agent walkthrough[^4]
 
@@ -954,7 +1156,7 @@ async def main():
 anyio.run(main())
 ```
 
-### Example 15: Customer Support Shopify Integration
+### Example 18: Customer Support Shopify Integration
 
 **Based on**: Custom tool pattern for e-commerce[^5]
 
@@ -1022,7 +1224,7 @@ When customers ask about their orders, use the lookup_order tool to get real-tim
 anyio.run(main())
 ```
 
-### Example 16: Document Generation Agent
+### Example 19: Document Generation Agent
 
 **Based on**: Real-world document creation workflows[^6]
 

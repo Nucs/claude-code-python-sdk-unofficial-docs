@@ -584,9 +584,12 @@ SettingSource = Literal["user", "project", "local"]
 | `"project"` | Shared project settings (version controlled) | `.claude/settings.json` |
 | `"local"` | Local project settings (gitignored) | `.claude/settings.local.json` |
 
-**Default Behavior**: When `setting_sources` is **omitted** or **`None`**, the SDK does **not** load any filesystem settings.
+**Default Behavior Changed** (Breaking Change):
+- **Previous behavior** (legacy): Loaded all settings sources by default
+- **Current behavior** (v2.0+): When `setting_sources` is **omitted** or **`None`**, the SDK does **NOT** load any filesystem settings
+- **Impact**: Existing code relying on automatic settings loading will need to explicitly set `setting_sources`
 
-**Important**: Must include `"project"` to load CLAUDE.md files.
+**Important**: Must include `"project"` to load CLAUDE.md files. If your code previously relied on automatic CLAUDE.md loading, you must now add `setting_sources=["project"]`.
 
 **Examples**:
 ```python
@@ -841,7 +844,12 @@ HookEvent = Literal[
 ]
 ```
 
-> **Note**: Due to setup limitations, the Python SDK does not support SessionStart, SessionEnd, and Notification hooks.
+> **Important**: The Python SDK has hook limitations due to its architecture. The following hooks are **NOT supported** in Python (they work in TypeScript only):
+> - `SessionStart` - Session initialization hook
+> - `SessionEnd` - Session cleanup hook
+> - `Notification` - Real-time notification hook
+>
+> This is a fundamental limitation of the Python SDK's design and will not be added in future versions. Use the TypeScript SDK if these hooks are required.
 
 ### `HookCallback`
 
