@@ -794,8 +794,7 @@ async def accumulate_response():
 
     options = ClaudeAgentOptions(
         system_prompt="You are a helpful code analysis assistant.",
-        allowed_tools=["Read", "Grep"],
-        max_tokens=2000
+        allowed_tools=["Read", "Grep"]
     )
 
     # Accumulate all response text
@@ -2377,12 +2376,7 @@ Error: Maximum context length exceeded
 
 **Solutions**:
 
-1. **Reduce max_tokens**:
-   ```python
-   options = ClaudeAgentOptions(max_tokens=4096)
-   ```
-
-2. **Limit Conversation Turns**:
+1. **Limit Conversation Turns**:
    ```python
    options = ClaudeAgentOptions(max_turns=20)
    ```
