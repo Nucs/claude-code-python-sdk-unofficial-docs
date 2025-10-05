@@ -515,7 +515,21 @@ main();
 
 ## Official SDK Examples
 
-These examples are based on the [official Anthropic SDK repository](https://github.com/anthropics/claude-agent-sdk-python/tree/main/examples). All 12 official examples demonstrate production-ready patterns.
+These examples are based on the [official Anthropic SDK repository](https://github.com/anthropics/claude-agent-sdk-python/tree/main/examples). The repository contains 12 official examples demonstrating production-ready patterns:
+
+**Available Examples**:
+1. `quick_start.py` - Basic SDK usage patterns
+2. `agents.py` - Custom agent definitions (code-reviewer, doc-writer)
+3. `hooks.py` - Safety hooks and permission controls
+4. `streaming_mode.py` - Streaming response handling
+5. `streaming_mode_ipython.py` - IPython-specific streaming
+6. `streaming_mode_trio.py` - Trio async framework integration
+7. `system_prompt.py` - System prompt configuration
+8. `include_partial_messages.py` - Partial message streaming
+9. `setting_sources.py` - Filesystem settings loading
+10. `stderr_callback_example.py` - Error output handling
+11. `tool_permission_callback.py` - Dynamic tool permissions
+12. `mcp_calculator.py` - MCP server implementation example
 
 ### Example 8: Custom Agent Definition
 
@@ -690,11 +704,199 @@ anyio.run(multi_agent_documentation)
 - Security via tool restrictions
 - Parallel execution when possible
 
+### Example 11: Streaming Modes
+
+**Source**: `examples/streaming_mode.py` from official repository
+
+**Purpose**: Handle streaming responses with real-time output
+
+```python
+import anyio
+from claude_agent_sdk import ClaudeSDKClient, ClaudeAgentOptions, AssistantMessage, TextBlock
+
+async def streaming_example():
+    """Stream responses as they arrive for better UX."""
+
+    options = ClaudeAgentOptions(
+        include_partial_messages=True,  # Enable streaming partial updates
+        allowed_tools=["Read", "Write"]
+    )
+
+    async with ClaudeSDKClient(options=options) as client:
+        await client.query("Write a short story about a robot learning to code")
+
+        async for message in client.receive_response():
+            if isinstance(message, AssistantMessage):
+                for block in message.content:
+                    if isinstance(block, TextBlock):
+                        # Print text as it streams in
+                        print(block.text, end='', flush=True)
+
+anyio.run(streaming_example)
+```
+
+**Key Features**:
+- `include_partial_messages=True` enables streaming
+- Messages arrive incrementally for real-time display
+- Better user experience for long-running tasks
+
+### Example 12: Setting Sources Configuration
+
+**Source**: `examples/setting_sources.py` from official repository
+
+**Purpose**: Control which filesystem settings to load
+
+```python
+import anyio
+from claude_agent_sdk import query, ClaudeAgentOptions
+
+async def settings_example():
+    """Demonstrate different setting source configurations."""
+
+    # Load all settings (legacy behavior)
+    all_settings = ClaudeAgentOptions(
+        setting_sources=["user", "project", "local"]
+    )
+
+    # Load only project settings (common for SDK usage)
+    project_only = ClaudeAgentOptions(
+        setting_sources=["project"]  # Loads .claude/settings.json and CLAUDE.md
+    )
+
+    # No filesystem settings (SDK-only configuration)
+    sdk_only = ClaudeAgentOptions(
+        # setting_sources=None is the default in v2.0+
+        mcp_servers={...},
+        agents={...}
+    )
+
+    async for message in query(
+        prompt="Analyze project structure",
+        options=project_only
+    ):
+        print(message)
+
+anyio.run(settings_example)
+```
+
+**Breaking Change (v2.0+)**:
+- **Previous behavior**: Loaded all settings sources by default
+- **Current behavior**: When `setting_sources` is omitted or `None`, no filesystem settings are loaded
+- **Migration**: Add `setting_sources=["project"]` to maintain previous behavior
+
+### Example 13: Tool Permission Callback
+
+**Source**: `examples/tool_permission_callback.py` from official repository
+
+**Purpose**: Dynamic tool permission decisions at runtime
+
+```python
+import anyio
+from claude_agent_sdk import query, ClaudeAgentOptions
+
+async def permission_callback(tool_name: str, input_data: dict, context: dict):
+    """Custom permission logic for tool execution."""
+
+    # Allow read-only operations automatically
+    if tool_name in ["Read", "Grep", "Glob"]:
+        return {"behavior": "allow", "updatedInput": input_data}
+
+    # Require explicit confirmation for writes
+    if tool_name in ["Write", "Edit"]:
+        file_path = input_data.get("file_path", "")
+        if "/tmp/" in file_path:
+            return {"behavior": "allow", "updatedInput": input_data}
+        else:
+            # In production, this could trigger a notification or approval workflow
+            print(f"⚠️  Write requested to: {file_path}")
+            return {"behavior": "allow", "updatedInput": input_data}
+
+    # Block destructive operations
+    if tool_name == "Bash":
+        command = input_data.get("command", "")
+        if any(danger in command for danger in ["rm -rf", "dd if=", "mkfs"]):
+            return {
+                "behavior": "deny",
+                "message": "Blocked potentially dangerous command"
+            }
+
+    return {"behavior": "allow", "updatedInput": input_data}
+
+async def main():
+    options = ClaudeAgentOptions(
+        allowed_tools=["Read", "Write", "Bash"],
+        can_use_tool=permission_callback
+    )
+
+    async for message in query(
+        prompt="Clean up old log files in /tmp",
+        options=options
+    ):
+        print(message)
+
+anyio.run(main)
+```
+
+**Permission Response Options**:
+- `{"behavior": "allow", "updatedInput": data}` - Allow execution
+- `{"behavior": "deny", "message": "reason"}` - Block execution
+- Can modify `updatedInput` to transform tool parameters
+
+### Example 14: Error Handling with Stderr Callback
+
+**Source**: `examples/stderr_callback_example.py` from official repository
+
+**Purpose**: Custom stderr processing and logging
+
+```python
+import anyio
+from claude_agent_sdk import query, ClaudeAgentOptions
+import logging
+
+# Setup logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+def stderr_handler(stderr_line: str):
+    """Process stderr output from Claude Code CLI."""
+
+    # Log all stderr to file
+    logger.error(f"SDK stderr: {stderr_line}")
+
+    # Parse specific error patterns
+    if "ENOENT" in stderr_line:
+        logger.critical("File not found error detected")
+    elif "EACCES" in stderr_line:
+        logger.critical("Permission denied error detected")
+    elif "context length exceeded" in stderr_line:
+        logger.warning("Context limit reached - consider /compact")
+
+async def main():
+    options = ClaudeAgentOptions(
+        stderr=stderr_handler,  # Custom stderr processing
+        allowed_tools=["Read", "Bash"]
+    )
+
+    async for message in query(
+        prompt="Run git status and analyze output",
+        options=options
+    ):
+        print(message)
+
+anyio.run(main)
+```
+
+**Use Cases**:
+- Production monitoring and alerting
+- Custom error logging and metrics
+- Debug information collection
+- Integration with external logging systems
+
 ---
 
 ## SuperClaude Integration Examples
 
-### Example 11: Framework-Aware Query
+### Example 15: Framework-Aware Query
 
 **Purpose**: Load CLAUDE.md and activate SuperClaude framework features
 
@@ -738,7 +940,7 @@ anyio.run(main)
 
 **See**: [CLAUDE.md](../../../CLAUDE.md), [PRINCIPLES.md](../../../PRINCIPLES.md), [RULES.md](../../../RULES.md)
 
-### Example 12: MODE Activation
+### Example 16: MODE Activation
 
 **Purpose**: Activate behavioral modes for specialized workflows
 
@@ -786,7 +988,7 @@ anyio.run(main)
 
 **Available Modes**: `--task-manage`, `--orchestrate`, `--brainstorm`, `--introspect`, `--token-efficient`, `--think`, `--think-hard`, `--ultrathink`
 
-### Example 13: MCP Server Integration
+### Example 17: MCP Server Integration
 
 **Purpose**: Use Sequential MCP for complex multi-step reasoning
 
@@ -838,7 +1040,7 @@ anyio.run(main)
 
 **See**: [@MCP_Sequential.md](../../../MCP_Sequential.md), [tools-and-mcp.md](tools-and-mcp.md)
 
-### Example 14: Cross-Session Memory with Serena
+### Example 18: Cross-Session Memory with Serena
 
 **Purpose**: Persist context across multiple sessions using Serena MCP
 
@@ -932,7 +1134,7 @@ anyio.run(session_2_continue)
 
 **See**: [@MCP_Serena.md](../../../MCP_Serena.md), [MODE_Task_Management.md](../../../MODE_Task_Management.md)
 
-### Example 15: Multi-MCP Orchestration
+### Example 19: Multi-MCP Orchestration
 
 **Purpose**: Coordinate multiple MCP servers for comprehensive workflows
 
@@ -998,7 +1200,7 @@ anyio.run(main)
 - **Magic**: Production-ready UI component generation [@MCP_Magic.md](../../../MCP_Magic.md)
 - **Orchestration Mode**: Intelligent tool routing and optimization [MODE_Orchestration.md](../../../MODE_Orchestration.md)
 
-### Example 16: RULES.md Enforcement via Hooks
+### Example 20: RULES.md Enforcement via Hooks
 
 **Purpose**: Enforce framework safety rules using hook system
 
@@ -1070,7 +1272,7 @@ anyio.run(main)
 
 **See**: [RULES.md](../../../RULES.md), [api-reference.md#hooks-system](api-reference.md#hooks-system)
 
-### Example 17: Real-World Email Agent
+### Example 21: Real-World Email Agent
 
 **Based on**: Anthropic's email agent walkthrough[^4]
 
@@ -1156,7 +1358,7 @@ async def main():
 anyio.run(main())
 ```
 
-### Example 18: Customer Support Shopify Integration
+### Example 22: Customer Support Shopify Integration
 
 **Based on**: Custom tool pattern for e-commerce[^5]
 
@@ -1224,7 +1426,7 @@ When customers ask about their orders, use the lookup_order tool to get real-tim
 anyio.run(main())
 ```
 
-### Example 19: Document Generation Agent
+### Example 23: Document Generation Agent
 
 **Based on**: Real-world document creation workflows[^6]
 
