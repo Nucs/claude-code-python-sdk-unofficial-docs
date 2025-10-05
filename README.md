@@ -46,22 +46,19 @@ Visit the live documentation: **[https://Nucs.github.io/claude-code-python-sdk-u
 
 ## 📖 Documentation Structure
 
-```
-docs/
-├── index.md                    # Home page
-├── overview.md                 # SDK overview
-├── getting-started.md          # Quick start guide
-├── architecture.md             # Agent loop & internals
-├── api-reference.md           # Complete API docs
-├── tools-and-mcp.md           # Custom tools & MCP
-├── real-world-use-cases.md    # 28 case studies
-├── production-patterns.md      # Enterprise deployment
-├── security.md                # Security best practices
-├── performance-optimization.md # Performance tuning
-├── troubleshooting.md         # Common issues & fixes
-├── community-resources.md      # Community & learning
-└── references.md              # 127 verified sources
-```
+- **[index.md](https://Nucs.github.io/claude-code-python-sdk-unofficial-docs/)** - Home page
+- **[overview.md](https://Nucs.github.io/claude-code-python-sdk-unofficial-docs/overview/)** - SDK overview
+- **[getting-started.md](https://Nucs.github.io/claude-code-python-sdk-unofficial-docs/getting-started/)** - Quick start guide
+- **[architecture.md](https://Nucs.github.io/claude-code-python-sdk-unofficial-docs/architecture/)** - Agent loop & internals
+- **[api-reference.md](https://Nucs.github.io/claude-code-python-sdk-unofficial-docs/api-reference/)** - Complete API docs
+- **[tools-and-mcp.md](https://Nucs.github.io/claude-code-python-sdk-unofficial-docs/tools-and-mcp/)** - Custom tools & MCP
+- **[real-world-use-cases.md](https://Nucs.github.io/claude-code-python-sdk-unofficial-docs/real-world-use-cases/)** - 28 case studies
+- **[production-patterns.md](https://Nucs.github.io/claude-code-python-sdk-unofficial-docs/production-patterns/)** - Enterprise deployment
+- **[security.md](https://Nucs.github.io/claude-code-python-sdk-unofficial-docs/security/)** - Security best practices
+- **[performance-optimization.md](https://Nucs.github.io/claude-code-python-sdk-unofficial-docs/performance-optimization/)** - Performance tuning
+- **[troubleshooting.md](https://Nucs.github.io/claude-code-python-sdk-unofficial-docs/troubleshooting/)** - Common issues & fixes
+- **[community-resources.md](https://Nucs.github.io/claude-code-python-sdk-unofficial-docs/community-resources/)** - Community & learning
+- **[references.md](https://Nucs.github.io/claude-code-python-sdk-unofficial-docs/references/)** - 127 verified sources
 
 ## 🌐 Deploy to GitHub Pages
 
